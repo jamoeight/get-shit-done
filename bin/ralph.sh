@@ -24,6 +24,7 @@ source "${SCRIPT_DIR}/lib/state.sh"
 source "${SCRIPT_DIR}/lib/display.sh"
 source "${SCRIPT_DIR}/lib/failfast.sh"
 source "${SCRIPT_DIR}/lib/parse.sh"
+source "${SCRIPT_DIR}/lib/invoke.sh"
 
 # Log file configuration
 LOG_FILE="${LOG_FILE:-.planning/ralph.log}"
@@ -213,6 +214,14 @@ iteration=0
 next_task=""
 iteration_start=0
 iteration_duration=0
+output_file=""
+exit_code=0
+summary=""
+error_msg=""
+choice=0
+next_plan=""
+skip_phase_num=""
+skip_plan_name=""
 while true; do
     iteration=$((iteration + 1))
 
@@ -238,28 +247,85 @@ while true; do
     # Record iteration start time
     iteration_start=$(date +%s)
 
-    # Show iteration start
-    show_status "[$iteration/$MAX_ITERATIONS] Starting $next_task..." "info"
+    # Show running indicator with spinner
+    start_spinner "[$iteration/$MAX_ITERATIONS] Running ${next_task}..."
 
-    # PLACEHOLDER: Claude invocation will be added in 03-02
-    # For now, simulate success and exit for testing
-    # Real invocation will:
-    # 1. Call invoke_claude "$next_task"
-    # 2. Check exit code
-    # 3. Parse response for summary
-    # 4. Call handle_iteration_success or handle_iteration_failure_state
+    # Invoke Claude
+    output_file=$(invoke_claude "$next_task")
+    exit_code=$?
 
-    # Calculate iteration duration
-    iteration_duration=$(( $(date +%s) - iteration_start ))
+    stop_spinner
 
-    # Simulate success (placeholder - 03-02 will add real invocation)
-    echo "TODO: invoke_claude $next_task"
-    echo "(Simulating success for testing)"
+    # Check for duration alert (30 min)
+    check_iteration_duration "$iteration_start"
 
-    # For testing: call success handler with simulated summary
-    handle_iteration_success "$iteration" "$next_task" "Test iteration completed" "$iteration_duration"
+    # Calculate duration
+    iteration_end=$(date +%s)
+    iteration_duration=$((iteration_end - iteration_start))
 
-    break  # Exit after first iteration for now (remove when Claude invocation added)
+    # Handle result based on exit code
+    if [[ $exit_code -eq 0 ]]; then
+        # Success - parse output for summary
+        summary=$(parse_claude_output "$output_file")
+        show_status "[$iteration] Completed: $next_task (${iteration_duration}s)" "success"
+
+        # Update state
+        handle_iteration_success "$iteration" "$next_task" "$summary" "$iteration_duration"
+
+        # Mark checkpoint after successful iteration
+        mark_checkpoint
+
+        # Clean up temp file
+        rm -f "$output_file" 2>/dev/null
+
+    else
+        # Check if this is a Claude crash (abnormal exit)
+        # Exit codes > 1 typically indicate crashes/errors vs normal failure
+        if [[ $exit_code -gt 1 ]]; then
+            handle_claude_crash "$exit_code" "$next_task"
+            rm -f "$output_file" 2>/dev/null
+            exit 1
+        fi
+
+        # Normal failure - parse error and offer user choice
+        error_msg=$(parse_claude_output "$output_file")
+        rm -f "$output_file" 2>/dev/null
+
+        # Record failure in state
+        handle_iteration_failure_state "$iteration" "$next_task" "$error_msg" "$iteration_duration"
+
+        # Present user with Retry/Skip/Abort choice
+        handle_iteration_failure "$next_task" "$error_msg"
+        choice=$?
+
+        case $choice in
+            0)  # Retry
+                show_status "Retrying $next_task..." "warning"
+                add_iteration_entry "$iteration" "RETRY" "$next_task: Retrying..."
+                continue  # Loop again on same task
+                ;;
+            1)  # Skip - advance to next plan
+                add_iteration_entry "$iteration" "SKIPPED" "$next_task: Skipped by user"
+                # Use get_next_plan_after to determine and set next task
+                next_plan=$(get_next_plan_after "$next_task")
+                if [[ "$next_plan" == "COMPLETE" ]]; then
+                    update_next_action "COMPLETE" "COMPLETE" "All plans executed (last task skipped)"
+                    show_status "All tasks complete (last was skipped)" "warning"
+                    break
+                else
+                    skip_phase_num="${next_plan%%-*}"
+                    skip_plan_name=$(get_plan_name "$next_plan")
+                    update_next_action "$skip_phase_num" "$next_plan" "$skip_plan_name (skipped ${next_task})"
+                    show_status "Skipped $next_task, advancing to $next_plan" "warning"
+                fi
+                ;;
+            2)  # Abort
+                add_iteration_entry "$iteration" "ABORTED" "$next_task: User aborted"
+                show_status "Aborted by user" "warning"
+                exit 1
+                ;;
+        esac
+    fi
 done
 
 # =============================================================================
