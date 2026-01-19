@@ -81,11 +81,11 @@ Plans:
   2. Commit message includes iteration number and task completed
   3. Progress can be reconstructed from git history if STATE.md is lost
   4. Partial work is not committed (only successful completions)
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 04-01: Atomic commit integration in outer loop
-- [ ] 04-02: Commit message formatting and history recovery
+- [ ] 04-01-PLAN.md — Atomic commit integration (checkpoint.sh library, startup validation, commit after success)
+- [ ] 04-02-PLAN.md — History recovery (extract last task from git, validate STATE.md vs git history)
 
 ### Phase 5: Exit Conditions
 **Goal**: Determine when autonomous execution should stop
