@@ -5,22 +5,22 @@
 See: .planning/PROJECT.md (updated 2026-01-19)
 
 **Core value:** Plan once, walk away, wake up to done. No human needed at the computer after planning.
-**Current focus:** Phase 5 - Exit Conditions
+**Current focus:** Phase 6 - Circuit Breaker & Recovery
 
 ## Current Position
 
-Phase: 5 of 10 (Exit Conditions)
-Plan: 1 of 3 in current phase
-Status: In progress
-Last activity: 2026-01-19 - Completed 05-01-PLAN.md
+Phase: 6 of 10 (Circuit Breaker & Recovery)
+Plan: 0 of 2 in current phase
+Status: Starting phase
+Last activity: 2026-01-19 - Completed Phase 5 (05-02-PLAN.md)
 
-Progress: [###########                   ] 38%
+Progress: [############                  ] 42%
 
 ## Next Action
 
-Command: /gsd:execute-phase 5
-Description: Execute plan 05-02 (Test-based completion detection)
-Read: ROADMAP.md, 05-02-PLAN.md
+Command: /gsd:execute-phase 6
+Description: Execute plan 06-01 (Circuit breaker pattern implementation)
+Read: ROADMAP.md, 06-01-PLAN.md
 
 ## Iteration History
 
@@ -32,9 +32,9 @@ Read: ROADMAP.md, 05-02-PLAN.md
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 10
-- Average duration: ~3.6 min
-- Total execution time: ~36 minutes
+- Total plans completed: 11
+- Average duration: ~3.8 min
+- Total execution time: ~42 minutes
 
 **By Phase:**
 
@@ -44,10 +44,10 @@ Read: ROADMAP.md, 05-02-PLAN.md
 | 2 - State Extensions | 2/2 | ~7 min | ~3.5 min |
 | 3 - Outer Loop Core | 3/3 | ~10 min | ~3.3 min |
 | 4 - Git Checkpointing | 2/2 | ~7 min | ~3.5 min |
-| 5 - Exit Conditions | 1/3 | ~4 min | ~4 min |
+| 5 - Exit Conditions | 2/3 | ~10 min | ~5 min |
 
 **Recent Trend:**
-- Last 5 plans: 03-02 (3m), 03-03 (2m), 04-01 (4m), 04-02 (3m), 05-01 (4m)
+- Last 5 plans: 03-03 (2m), 04-01 (4m), 04-02 (3m), 05-01 (4m), 05-02 (6m)
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -89,6 +89,10 @@ Recent decisions affecting current work:
 - Exit codes: 0=COMPLETED, 1=STUCK, 2=ABORTED, 3=INTERRUPTED
 - Critical sections protect checkpoint commits from interrupt
 - exit_with_status returns code, caller calls exit (functions never exit directly)
+- TESTS_UNKNOWN treated as passing (accept false negatives over false positives)
+- Dual-exit gate: both tests pass AND all plans complete required for COMPLETED status
+- Test parsing uses generic patterns (PASS/FAIL/OK/ERROR) for framework independence
+- last_output_file preserved between iterations for completion check
 
 ### Pending Todos
 
@@ -101,5 +105,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-01-19
-Stopped at: Completed 05-01-PLAN.md
+Stopped at: Completed 05-02-PLAN.md
 Resume file: None
