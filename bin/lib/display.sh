@@ -96,3 +96,59 @@ show_status() {
 
     echo -e "${color}${message}${RESET}"
 }
+
+# =============================================================================
+# Spinner Functions (Cross-Platform)
+# =============================================================================
+
+# Spinner state
+SPINNER_PID=""
+
+# start_spinner - Start background spinner with message
+# Args: message
+# Uses ASCII-only characters for Git Bash compatibility
+start_spinner() {
+    local message="$1"
+
+    # ASCII-only spinner characters (works everywhere)
+    local spin_chars='|/-\'
+
+    # Don't start spinner if not a terminal
+    if [[ ! -t 1 ]]; then
+        echo "$message"
+        return 0
+    fi
+
+    # Disable job control messages
+    set +m 2>/dev/null || true
+
+    {
+        local i=0
+        while true; do
+            local char="${spin_chars:$i:1}"
+            printf "\r${CYAN}%s %s${RESET}" "$message" "$char"
+            i=$(( (i + 1) % 4 ))
+            sleep 0.25
+        done
+    } &
+
+    SPINNER_PID=$!
+
+    # Re-enable job control
+    set -m 2>/dev/null || true
+}
+
+# stop_spinner - Stop the background spinner
+# Cleans up spinner process and clears line
+stop_spinner() {
+    if [[ -n "$SPINNER_PID" ]]; then
+        kill "$SPINNER_PID" 2>/dev/null || true
+        wait "$SPINNER_PID" 2>/dev/null || true
+        SPINNER_PID=""
+        # Clear the spinner line
+        printf "\r\033[2K"
+    fi
+}
+
+# Ensure cleanup on script exit
+trap 'stop_spinner' EXIT
