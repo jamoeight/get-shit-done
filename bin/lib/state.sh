@@ -302,6 +302,118 @@ get_iteration_count() {
 }
 
 # =============================================================================
+# History Management Functions (Plan 02-02)
+# =============================================================================
+
+# Configuration for history rolling
+HISTORY_WINDOW=15
+ARCHIVE_FILE="${ARCHIVE_FILE:-.planning/iteration-history.md}"
+
+# get_history_entry_count - Count entries in Iteration History
+# Returns: Number of history entries (prints to stdout)
+# Return code: 0 on success, 1 on failure
+# Note: This is an alias for get_iteration_count but named for clarity
+get_history_entry_count() {
+    get_iteration_count
+}
+
+# rotate_history_at_phase_boundary - Archive old entries at phase boundaries
+# Args: current_phase (string, e.g., "Phase 2" or "02")
+# Returns: 0 on success, 1 on failure
+# Archives entries beyond HISTORY_WINDOW to iteration-history.md
+rotate_history_at_phase_boundary() {
+    local current_phase="$1"
+
+    if [[ -z "$current_phase" ]]; then
+        echo -e "${STATE_RED}Error: rotate_history_at_phase_boundary requires current_phase${STATE_RESET}" >&2
+        return 1
+    fi
+
+    if [[ ! -f "$STATE_FILE" ]]; then
+        echo -e "${STATE_RED}Error: STATE_FILE not found: $STATE_FILE${STATE_RESET}" >&2
+        return 1
+    fi
+
+    # Ensure archive file exists with header
+    if [[ ! -f "$ARCHIVE_FILE" ]]; then
+        _init_archive_file
+    fi
+
+    # Get current entry count
+    local entry_count
+    entry_count=$(get_history_entry_count)
+
+    # If within window, nothing to do
+    if [[ "$entry_count" -le "$HISTORY_WINDOW" ]]; then
+        return 0
+    fi
+
+    # Extract all entries (lines starting with | followed by number)
+    local all_entries
+    all_entries=$(sed -n '/<!-- HISTORY_START -->/,/<!-- HISTORY_END -->/{
+        /^| [0-9]/p
+    }' "$STATE_FILE")
+
+    # Calculate how many entries to archive
+    local entries_to_archive=$((entry_count - HISTORY_WINDOW))
+
+    # Split entries: keep recent (first HISTORY_WINDOW), archive old (rest)
+    # Note: newest entries are first (prepend pattern), so we keep the first N
+    local recent_entries
+    local archived_entries
+
+    recent_entries=$(echo "$all_entries" | head -n "$HISTORY_WINDOW")
+    archived_entries=$(echo "$all_entries" | tail -n "$entries_to_archive")
+
+    # Append archived entries to archive file with phase boundary marker
+    local timestamp
+    timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+
+    {
+        echo ""
+        echo "## Phase $current_phase Boundary - $timestamp"
+        echo ""
+        echo "| # | Timestamp | Outcome | Task |"
+        echo "|---|-----------|---------|------|"
+        echo "$archived_entries"
+    } >> "$ARCHIVE_FILE"
+
+    # Update STATE.md with only recent entries
+    local new_history="| # | Timestamp | Outcome | Task |
+|---|-----------|---------|------|"
+
+    if [[ -n "$recent_entries" ]]; then
+        new_history="$new_history
+$recent_entries"
+    fi
+
+    update_section "$STATE_FILE" "<!-- HISTORY_START -->" "<!-- HISTORY_END -->" "$new_history"
+    return $?
+}
+
+# _init_archive_file - Create archive file with initial header (internal function)
+# Returns: 0 on success, 1 on failure
+_init_archive_file() {
+    # Ensure directory exists
+    local archive_dir
+    archive_dir=$(dirname "$ARCHIVE_FILE")
+    if [[ ! -d "$archive_dir" ]]; then
+        mkdir -p "$archive_dir"
+    fi
+
+    # Create archive file with header
+    cat > "$ARCHIVE_FILE" << 'EOF'
+# Iteration History Archive
+
+Entries rolled off from STATE.md at phase boundaries.
+Git preserves full history; this file is for quick reference.
+
+---
+EOF
+    return $?
+}
+
+# =============================================================================
 # Progress Bar Functions (Plan 02-02)
 # =============================================================================
 
