@@ -83,34 +83,34 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| LOOP-01 | TBD | Pending |
-| LOOP-02 | TBD | Pending |
-| LOOP-03 | TBD | Pending |
-| LOOP-04 | TBD | Pending |
-| EXIT-01 | TBD | Pending |
-| EXIT-02 | TBD | Pending |
-| EXIT-03 | TBD | Pending |
-| SAFE-01 | TBD | Pending |
-| SAFE-02 | TBD | Pending |
-| PLAN-01 | TBD | Pending |
-| PLAN-02 | TBD | Pending |
-| PLAN-03 | TBD | Pending |
-| PLAN-04 | TBD | Pending |
-| STATE-01 | TBD | Pending |
-| STATE-02 | TBD | Pending |
-| STATE-03 | TBD | Pending |
-| STATE-04 | TBD | Pending |
-| CMD-01 | TBD | Pending |
-| CMD-02 | TBD | Pending |
-| CMD-03 | TBD | Pending |
-| CMD-04 | TBD | Pending |
-| CMD-05 | TBD | Pending |
+| SAFE-01 | Phase 1: Safety Foundation | Pending |
+| SAFE-02 | Phase 1: Safety Foundation | Pending |
+| STATE-01 | Phase 2: State Extensions | Pending |
+| STATE-03 | Phase 2: State Extensions | Pending |
+| LOOP-01 | Phase 3: Outer Loop Core | Pending |
+| LOOP-02 | Phase 3: Outer Loop Core | Pending |
+| STATE-02 | Phase 4: Git Checkpointing | Pending |
+| EXIT-01 | Phase 5: Exit Conditions | Pending |
+| EXIT-02 | Phase 5: Exit Conditions | Pending |
+| EXIT-03 | Phase 5: Exit Conditions | Pending |
+| LOOP-03 | Phase 6: Circuit Breaker & Recovery | Pending |
+| LOOP-04 | Phase 6: Circuit Breaker & Recovery | Pending |
+| STATE-04 | Phase 7: Learnings Propagation | Pending |
+| PLAN-01 | Phase 8: Upfront Planning | Pending |
+| PLAN-02 | Phase 8: Upfront Planning | Pending |
+| PLAN-03 | Phase 8: Upfront Planning | Pending |
+| PLAN-04 | Phase 8: Upfront Planning | Pending |
+| CMD-01 | Phase 9: Mode Selection & Base Commands | Pending |
+| CMD-05 | Phase 9: Mode Selection & Base Commands | Pending |
+| CMD-02 | Phase 10: Execution Commands | Pending |
+| CMD-03 | Phase 10: Execution Commands | Pending |
+| CMD-04 | Phase 10: Execution Commands | Pending |
 
 **Coverage:**
 - v1 requirements: 22 total
-- Mapped to phases: 0
-- Unmapped: 22
+- Mapped to phases: 22
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-01-19*
-*Last updated: 2026-01-19 after initial definition*
+*Last updated: 2026-01-19 after roadmap creation*
