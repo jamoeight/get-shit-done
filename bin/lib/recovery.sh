@@ -159,14 +159,28 @@ generate_stuck_analysis() {
         echo -e "  ${RECOVERY_CYAN}Pattern:${RECOVERY_RESET} No clear pattern detected in $failure_count failures"
     fi
 
-    # Provide suggestion based on patterns
+    # Provide actionable suggestion based on patterns (LOOP-04: alternative approaches)
     echo ""
+    echo -e "  ${RECOVERY_YELLOW}Possible actions:${RECOVERY_RESET}"
+
     if [[ -n "$PATTERN_FILE" ]]; then
-        echo -e "  ${RECOVERY_YELLOW}Suggestion:${RECOVERY_RESET} Check $PATTERN_FILE for issues"
-    elif [[ -n "$PATTERN_ERROR" ]]; then
-        echo -e "  ${RECOVERY_YELLOW}Suggestion:${RECOVERY_RESET} Investigate the recurring error above"
-    else
-        echo -e "  ${RECOVERY_YELLOW}Suggestion:${RECOVERY_RESET} Review recent changes or environment setup"
+        echo -e "    - Check $PATTERN_FILE for syntax errors or missing dependencies"
+        echo -e "    - Review recent changes to this file (git diff)"
+    fi
+
+    if [[ -n "$PATTERN_ERROR" ]]; then
+        echo -e "    - Search codebase for similar issues: grep -r '$PATTERN_ERROR'"
+    fi
+
+    if [[ -n "$PATTERN_TASK_PREFIX" ]]; then
+        echo -e "    - Phase $PATTERN_TASK_PREFIX may have environmental prerequisites"
+        echo -e "    - Consider running earlier phase plans first"
+    fi
+
+    if [[ "$patterns_found" != "true" ]]; then
+        echo -e "    - Check environment (missing tools, permissions, network)"
+        echo -e "    - Review .planning/ralph.log for detailed error output"
+        echo -e "    - Try running the failing task manually"
     fi
 
     return 0
