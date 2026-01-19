@@ -303,6 +303,9 @@ while true; do
         # Reset stuck detection on success
         reset_failure_tracking
 
+        # Reset circuit breaker on success
+        reset_circuit_breaker
+
         # Update state
         handle_iteration_success "$iteration" "$next_task" "$summary" "$iteration_duration"
 
@@ -344,6 +347,43 @@ while true; do
             loop_duration=$(($(date +%s) - START_TIME))
             exit_with_status "STUCK" "Same task failed $STUCK_THRESHOLD times" "$next_task" "$iteration" "$loop_duration"
             exit $EXIT_STUCK
+        fi
+
+        # Check circuit breaker (cross-task failures)
+        if check_circuit_breaker; then
+            # Circuit breaker tripped - handle pause
+            handle_circuit_breaker_pause "$next_task"
+            cb_choice=$?
+
+            case $cb_choice in
+                0)  # Resume - counter already reset in handle_circuit_breaker_pause
+                    show_status "Circuit breaker reset - resuming..." "warning"
+                    # Fall through to normal failure handling below
+                    ;;
+                1)  # Skip - advance to next task
+                    add_iteration_entry "$iteration" "SKIPPED" "$next_task: Skipped after circuit breaker"
+                    next_plan=$(get_next_plan_after "$next_task")
+                    if [[ "$next_plan" == "COMPLETE" ]]; then
+                        update_next_action "COMPLETE" "COMPLETE" "All plans executed (last task skipped)"
+                        show_status "All tasks complete (last was skipped)" "warning"
+                        loop_duration=$(($(date +%s) - START_TIME))
+                        exit_with_status "COMPLETED" "All plans done (last skipped)" "$next_task" "$iteration" "$loop_duration"
+                        exit $EXIT_COMPLETED
+                    else
+                        skip_phase_num="${next_plan%%-*}"
+                        skip_plan_name=$(get_plan_name "$next_plan")
+                        update_next_action "$skip_phase_num" "$next_plan" "$skip_plan_name (skipped ${next_task})"
+                        show_status "Skipped $next_task, advancing to $next_plan" "warning"
+                        continue  # Next iteration
+                    fi
+                    ;;
+                2)  # Abort
+                    add_iteration_entry "$iteration" "ABORTED" "$next_task: User aborted at circuit breaker"
+                    loop_duration=$(($(date +%s) - START_TIME))
+                    exit_with_status "ABORTED" "User aborted at circuit breaker" "$next_task" "$iteration" "$loop_duration"
+                    exit $EXIT_ABORTED
+                    ;;
+            esac
         fi
 
         # Present user with Retry/Skip/Abort choice
