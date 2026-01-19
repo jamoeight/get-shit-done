@@ -29,6 +29,96 @@ source "${SCRIPT_DIR}/lib/parse.sh"
 LOG_FILE="${LOG_FILE:-.planning/ralph.log}"
 
 # =============================================================================
+# Logging Functions
+# =============================================================================
+
+# log_iteration - Append iteration entry to log file
+# Args: iteration, status, task, summary, duration
+log_iteration() {
+    local iteration_num="$1"
+    local status="$2"
+    local task="$3"
+    local summary="$4"
+    local duration="$5"
+
+    local timestamp
+    timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+
+    # Ensure log file directory exists
+    local log_dir
+    log_dir=$(dirname "$LOG_FILE")
+    if [[ ! -d "$log_dir" ]]; then
+        mkdir -p "$log_dir"
+    fi
+
+    # Append to log file
+    {
+        echo "---"
+        echo "Iteration: $iteration_num"
+        echo "Timestamp: $timestamp"
+        echo "Task: $task"
+        echo "Status: $status"
+        echo "Duration: ${duration}s"
+        echo "Summary: $summary"
+    } >> "$LOG_FILE"
+}
+
+# handle_iteration_success - Process successful iteration
+# Args: iteration, task, summary, duration
+# Updates STATE.md and advances to next plan
+handle_iteration_success() {
+    local iteration_num="$1"
+    local task="$2"
+    local summary="$3"
+    local duration="$4"
+
+    # Log the iteration
+    log_iteration "$iteration_num" "SUCCESS" "$task" "$summary" "$duration"
+
+    # Add entry to STATE.md history
+    add_iteration_entry "$iteration_num" "SUCCESS" "$task: $summary"
+
+    # Determine next plan
+    local next_plan
+    next_plan=$(get_next_plan_after "$task")
+
+    if [[ "$next_plan" == "COMPLETE" ]]; then
+        # All plans done - update next action to reflect completion
+        update_next_action "COMPLETE" "COMPLETE" "All plans executed"
+    else
+        # Advance to next plan
+        local phase_num="${next_plan%%-*}"
+        local plan_name
+        plan_name=$(get_plan_name "$next_plan")
+        update_next_action "$phase_num" "$next_plan" "$plan_name"
+    fi
+
+    # Update progress bar
+    local completed total
+    completed=$(get_plans_completed)
+    total=$(get_total_plans)
+    update_progress "$completed" "$total"
+}
+
+# handle_iteration_failure_state - Process failed iteration (state only)
+# Args: iteration, task, error, duration
+# Updates STATE.md but does NOT advance next_action (retry same task)
+handle_iteration_failure_state() {
+    local iteration_num="$1"
+    local task="$2"
+    local error="$3"
+    local duration="$4"
+
+    # Log the iteration
+    log_iteration "$iteration_num" "FAILURE" "$task" "$error" "$duration"
+
+    # Add entry to STATE.md history
+    add_iteration_entry "$iteration_num" "FAILURE" "$task: $error"
+
+    # Do NOT update next_action - stay on same task for retry
+}
+
+# =============================================================================
 # Argument Parsing
 # =============================================================================
 
@@ -121,6 +211,8 @@ mark_checkpoint
 
 iteration=0
 next_task=""
+iteration_start=0
+iteration_duration=0
 while true; do
     iteration=$((iteration + 1))
 
@@ -143,13 +235,31 @@ while true; do
         break
     fi
 
+    # Record iteration start time
+    iteration_start=$(date +%s)
+
     # Show iteration start
     show_status "[$iteration/$MAX_ITERATIONS] Starting $next_task..." "info"
 
     # PLACEHOLDER: Claude invocation will be added in 03-02
-    # For now, just log and exit for testing
+    # For now, simulate success and exit for testing
+    # Real invocation will:
+    # 1. Call invoke_claude "$next_task"
+    # 2. Check exit code
+    # 3. Parse response for summary
+    # 4. Call handle_iteration_success or handle_iteration_failure_state
+
+    # Calculate iteration duration
+    iteration_duration=$(( $(date +%s) - iteration_start ))
+
+    # Simulate success (placeholder - 03-02 will add real invocation)
     echo "TODO: invoke_claude $next_task"
-    break  # Exit after first iteration for now
+    echo "(Simulating success for testing)"
+
+    # For testing: call success handler with simulated summary
+    handle_iteration_success "$iteration" "$next_task" "Test iteration completed" "$iteration_duration"
+
+    break  # Exit after first iteration for now (remove when Claude invocation added)
 done
 
 # =============================================================================
