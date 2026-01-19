@@ -300,3 +300,122 @@ get_iteration_count() {
     echo "$count"
     return 0
 }
+
+# =============================================================================
+# Progress Bar Functions (Plan 02-02)
+# =============================================================================
+
+# Configuration for progress bar
+PROGRESS_WIDTH=30
+
+# generate_progress_bar - Generate ASCII progress bar
+# Args: completed (int), total (int), [width (int)]
+# Returns: Bar string via stdout (e.g., "[##########                    ] 33%")
+# Default width: 30 characters
+generate_progress_bar() {
+    local completed="$1"
+    local total="$2"
+    local width="${3:-$PROGRESS_WIDTH}"
+
+    # Handle edge case: 0 total
+    if [[ "$total" -eq 0 ]]; then
+        printf '[%*s] 0%%\n' "$width" ""
+        return 0
+    fi
+
+    # Calculate percentage (integer division)
+    local percent=$((completed * 100 / total))
+
+    # Calculate filled portion
+    local filled=$((completed * width / total))
+    local empty=$((width - filled))
+
+    # Build the bar string
+    local bar=""
+    for ((i = 0; i < filled; i++)); do
+        bar+="#"
+    done
+    for ((i = 0; i < empty; i++)); do
+        bar+=" "
+    done
+
+    printf '[%s] %d%%\n' "$bar" "$percent"
+    return 0
+}
+
+# update_progress - Update Progress line in STATE.md
+# Args: completed (int), total (int)
+# Returns: 0 on success, 1 on failure
+update_progress() {
+    local completed="$1"
+    local total="$2"
+
+    if [[ -z "$completed" || -z "$total" ]]; then
+        echo -e "${STATE_RED}Error: update_progress requires completed and total${STATE_RESET}" >&2
+        return 1
+    fi
+
+    if [[ ! -f "$STATE_FILE" ]]; then
+        echo -e "${STATE_RED}Error: STATE_FILE not found: $STATE_FILE${STATE_RESET}" >&2
+        return 1
+    fi
+
+    # Generate the progress bar
+    local bar
+    bar=$(generate_progress_bar "$completed" "$total")
+
+    # Create temp file
+    local temp
+    temp=$(mktemp)
+
+    # Use sed to replace the Progress line
+    sed "s|^Progress: \[.*\] [0-9]*%$|Progress: $bar|" "$STATE_FILE" > "$temp"
+
+    # Atomic replace
+    mv "$temp" "$STATE_FILE"
+    return $?
+}
+
+# get_plans_completed - Count completed plans from ROADMAP.md
+# Returns: Number of completed plans (prints to stdout)
+# Counts lines matching `- [x]` pattern in phase Plans sections
+get_plans_completed() {
+    local roadmap="${ROADMAP_FILE:-.planning/ROADMAP.md}"
+
+    if [[ ! -f "$roadmap" ]]; then
+        echo -e "${STATE_RED}Error: ROADMAP_FILE not found: $roadmap${STATE_RESET}" >&2
+        return 1
+    fi
+
+    # Count lines matching "- [x]" pattern (completed plans)
+    local count
+    count=$(grep -c '^\- \[x\]' "$roadmap" 2>/dev/null || echo "0")
+
+    # Trim whitespace
+    count=$(echo "$count" | tr -d ' ')
+
+    echo "$count"
+    return 0
+}
+
+# get_total_plans - Count total plans from ROADMAP.md
+# Returns: Number of total plans (prints to stdout)
+# Counts lines matching `- [ ]` OR `- [x]` pattern
+get_total_plans() {
+    local roadmap="${ROADMAP_FILE:-.planning/ROADMAP.md}"
+
+    if [[ ! -f "$roadmap" ]]; then
+        echo -e "${STATE_RED}Error: ROADMAP_FILE not found: $roadmap${STATE_RESET}" >&2
+        return 1
+    fi
+
+    # Count lines matching "- [ ]" or "- [x]" pattern (all plans)
+    local count
+    count=$(grep -cE '^\- \[(x| )\]' "$roadmap" 2>/dev/null || echo "0")
+
+    # Trim whitespace
+    count=$(echo "$count" | tr -d ' ')
+
+    echo "$count"
+    return 0
+}
