@@ -279,6 +279,12 @@ while true; do
         # Update state
         handle_iteration_success "$iteration" "$next_task" "$summary" "$iteration_duration"
 
+        # Create checkpoint commit
+        if ! create_checkpoint_commit "$next_task" "$summary"; then
+            echo -e "${RED}FATAL: Cannot continue without successful checkpoint${RESET}"
+            exit 1
+        fi
+
         # Mark checkpoint after successful iteration
         mark_checkpoint
 
