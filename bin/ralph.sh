@@ -210,6 +210,12 @@ if ! validate_git_state; then
     exit 1
 fi
 
+# Validate STATE.md against git checkpoint history
+if ! validate_state_against_history; then
+    echo -e "${YELLOW}Please resolve the conflict and restart${RESET}"
+    exit 1
+fi
+
 # Mark checkpoint for potential rollback
 mark_checkpoint
 
