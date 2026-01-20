@@ -53,6 +53,13 @@ invoke_claude() {
         return 1
     fi
 
+    # Get relevant learnings for this phase
+    local phase_num="${task_id%%-*}"
+    local learnings=""
+    if type get_learnings_for_phase &>/dev/null; then
+        learnings=$(get_learnings_for_phase "$phase_num" 2>/dev/null || true)
+    fi
+
     # Build the prompt
     local prompt
     prompt="Execute plan ${task_id}.
@@ -62,6 +69,15 @@ Follow the execute-plan workflow from GSD.
 Commit each task atomically.
 Create SUMMARY.md when complete.
 Update STATE.md with position and decisions."
+
+    # Add learnings if available
+    if [[ -n "$learnings" && "$learnings" =~ [^[:space:]] ]]; then
+        prompt+="
+
+## Project Learnings (apply when relevant)
+
+${learnings}"
+    fi
 
     # Create temp file for output
     local output_file
