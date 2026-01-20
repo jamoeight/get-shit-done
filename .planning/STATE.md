@@ -5,22 +5,22 @@
 See: .planning/PROJECT.md (updated 2026-01-19)
 
 **Core value:** Plan once, walk away, wake up to done. No human needed at the computer after planning.
-**Current focus:** Phase 7 - Learnings Propagation
+**Current focus:** Phase 8 - Upfront Planning
 
 ## Current Position
 
-Phase: 7 of 10 (Learnings Propagation)
-Plan: 1 of 2 in current phase
-Status: In progress
-Last activity: 2026-01-19 - Completed 07-01-PLAN.md
+Phase: 8 of 10 (Upfront Planning)
+Plan: 0 of 4 in current phase
+Status: Phase complete
+Last activity: 2026-01-19 - Completed 07-02-PLAN.md
 
-Progress: [#################             ] 56%
+Progress: [##################            ] 60%
 
 ## Next Action
 
-Command: /gsd:execute-phase 7
-Description: Execute plan 07-02 (Learning Integration)
-Read: ROADMAP.md, 07-02-PLAN.md
+Command: /gsd:execute-phase 8
+Description: Execute plan 08-01 (plan-milestone-all workflow design)
+Read: ROADMAP.md, 08-01-PLAN.md
 
 ## Iteration History
 
@@ -32,9 +32,9 @@ Read: ROADMAP.md, 07-02-PLAN.md
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 14
+- Total plans completed: 15
 - Average duration: ~3.9 min
-- Total execution time: ~54 minutes
+- Total execution time: ~58 minutes
 
 **By Phase:**
 
@@ -46,10 +46,10 @@ Read: ROADMAP.md, 07-02-PLAN.md
 | 4 - Git Checkpointing | 2/2 | ~7 min | ~3.5 min |
 | 5 - Exit Conditions | 2/2 | ~10 min | ~5 min |
 | 6 - Circuit Breaker | 2/2 | ~8 min | ~4 min |
-| 7 - Learnings Propagation | 1/2 | ~4 min | ~4 min |
+| 7 - Learnings Propagation | 2/2 | ~8 min | ~4 min |
 
 **Recent Trend:**
-- Last 5 plans: 05-01 (4m), 05-02 (6m), 06-01 (4m), 06-02 (4m), 07-01 (4m)
+- Last 5 plans: 05-02 (6m), 06-01 (4m), 06-02 (4m), 07-01 (4m), 07-02 (4m)
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -106,6 +106,9 @@ Recent decisions affecting current work:
 - Exact-match deduplication for learnings using grep -qF
 - Phase N learnings go under ## Phase-Specific as ### subsections
 - patterns-established -> Phase section, key-decisions -> Codebase Patterns
+- Safe optional dependency using type check (type func &>/dev/null)
+- Learnings injected under '## Project Learnings' header in Claude prompt
+- Learning extraction happens before checkpoint commit (included in commit)
 
 ### Pending Todos
 
@@ -118,5 +121,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-01-19
-Stopped at: Completed 07-01-PLAN.md
+Stopped at: Completed 07-02-PLAN.md (Phase 7 complete)
 Resume file: None

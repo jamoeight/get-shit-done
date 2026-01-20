@@ -18,7 +18,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 4: Git Checkpointing** - Atomic commits as iteration boundaries for progress persistence
 - [x] **Phase 5: Exit Conditions** - Test-based completion, stuck detection, and dual-exit gate
 - [x] **Phase 6: Circuit Breaker & Recovery** - Pause after consecutive failures, analyze stuck state
-- [ ] **Phase 7: Learnings Propagation** - Write discovered patterns to AGENTS.md across iterations
+- [x] **Phase 7: Learnings Propagation** - Write discovered patterns to AGENTS.md across iterations
 - [ ] **Phase 8: Upfront Planning** - Generate all PLAN.md files before autonomous execution begins
 - [ ] **Phase 9: Mode Selection & Base Commands** - Interactive vs Lazy mode selection at startup
 - [ ] **Phase 10: Execution Commands** - Full command set for autonomous milestone execution
@@ -129,8 +129,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 07-01-PLAN.md — Learning extraction library (learnings.sh with init, get, append, extract, prune)
-- [ ] 07-02-PLAN.md — AGENTS.md integration into invoke and ralph loop
+- [x] 07-01-PLAN.md — Learning extraction library (learnings.sh with init, get, append, extract, prune)
+- [x] 07-02-PLAN.md — AGENTS.md integration into invoke and ralph loop
 
 ### Phase 8: Upfront Planning
 **Goal**: Generate all PLAN.md files for all phases before autonomous execution
@@ -196,7 +196,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 4. Git Checkpointing | 2/2 | Complete | 2026-01-19 |
 | 5. Exit Conditions | 2/2 | Complete | 2026-01-19 |
 | 6. Circuit Breaker & Recovery | 2/2 | Complete | 2026-01-19 |
-| 7. Learnings Propagation | 0/2 | Not started | - |
+| 7. Learnings Propagation | 2/2 | Complete | 2026-01-19 |
 | 8. Upfront Planning | 0/4 | Not started | - |
 | 9. Mode Selection & Base Commands | 0/2 | Not started | - |
 | 10. Execution Commands | 0/4 | Not started | - |
