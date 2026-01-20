@@ -62,6 +62,7 @@ Deferred to future release. Tracked but not in current roadmap.
 - **REC-01**: Multi-model verification (critic agent reviews work before exit)
 - **REC-02**: Checkpointing with resume (serialize full execution state beyond git)
 - **REC-03**: Parallel phase execution (independent phases run simultaneously)
+- **REC-04**: Failure learnings propagation (extract "what went wrong" from failed attempts, feed to retry with structured context so next attempt has richer understanding of the failure)
 
 ## Out of Scope
 
