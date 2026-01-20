@@ -56,12 +56,21 @@ validate_number() {
 
 # save_config - Persist to .planning/.ralph-config
 # Writes current MAX_ITERATIONS and TIMEOUT_HOURS values
+# Preserves existing GSD_MODE value if set
 save_config() {
     # Create parent directory if needed
     local config_dir
     config_dir="$(dirname "$RALPH_CONFIG_FILE")"
     if [ ! -d "$config_dir" ]; then
         mkdir -p "$config_dir"
+    fi
+
+    # Load existing mode (if any) to preserve it
+    local existing_mode=""
+    if [ -f "$RALPH_CONFIG_FILE" ]; then
+        # shellcheck source=/dev/null
+        source "$RALPH_CONFIG_FILE" 2>/dev/null
+        existing_mode="${GSD_MODE:-}"
     fi
 
     # Write bash variable assignments (can be sourced)
@@ -71,6 +80,11 @@ save_config() {
 MAX_ITERATIONS=$MAX_ITERATIONS
 TIMEOUT_HOURS=$TIMEOUT_HOURS
 EOF
+
+    # Append mode if it was set
+    if [ -n "$existing_mode" ]; then
+        echo "GSD_MODE=$existing_mode" >> "$RALPH_CONFIG_FILE"
+    fi
 
     echo -e "${BUDGET_GREEN}Configuration saved to $RALPH_CONFIG_FILE${BUDGET_RESET}"
 }
