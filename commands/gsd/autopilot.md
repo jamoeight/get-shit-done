@@ -108,16 +108,81 @@ Configuration saved to .planning/.ralph-config
 User must consciously confirm settings before autonomous run begins.
 </step>
 
-<step name="detect_plans" placeholder="true">
-**Step 2: Detect Existing Plans** (Plan 02)
+<step name="detect_plans">
+**Step 2: Detect Existing Plans**
 
-<!-- TODO: Implement in 10-02-PLAN.md
-- Check if .planning/phases/ has PLAN.md files
-- If plans exist: prompt "Plans exist. Use existing or regenerate?"
-- If no plans: proceed to planning phase
--->
+Check if plans exist for all phases.
 
-Placeholder - will be implemented in Plan 02.
+```bash
+# Count phases in ROADMAP.md
+TOTAL_PHASES=$(grep -cE "^### Phase [0-9]" .planning/ROADMAP.md || echo 0)
+
+# Count phases with PLAN.md files
+PHASES_WITH_PLANS=$(find .planning/phases -name "*-*-PLAN.md" -type f 2>/dev/null | sed 's|.*phases/||;s|/.*||' | sort -u | wc -l | tr -d ' ')
+
+if [[ "$PHASES_WITH_PLANS" -lt "$TOTAL_PHASES" ]]; then
+    PLANS_NEEDED=true
+    echo "Plans needed: $((TOTAL_PHASES - PHASES_WITH_PLANS)) phase(s) without plans"
+fi
+```
+
+**If plans exist for all phases:**
+
+Prompt the user:
+```
+Plans exist for all phases.
+Use existing plans or regenerate? [use/regenerate]
+```
+
+- If user selects "use": Skip planning, proceed to Step 3
+- If user selects "regenerate": Proceed to Step 2b (planning)
+
+**If plans are missing:**
+
+Display message and proceed to planning:
+```
+Planning needed for {count} phase(s)
+Proceeding to generate plans...
+```
+</step>
+
+<step name="execute_planning">
+**Step 2b: Execute Planning (if needed)**
+
+When planning is required (missing plans or user chose regenerate), spawn the planning orchestrator.
+
+Use Task tool to spawn plan-milestone-all:
+```
+Task(
+  prompt="Run /gsd:plan-milestone-all with --skip-research flag",
+  subagent_type="orchestrator",
+  description="Generate all phase plans"
+)
+```
+
+Wait for planning completion before proceeding.
+
+**If planning fails:**
+```
+==========================================
+ PLANNING FAILED
+==========================================
+
+Error: Could not generate phase plans.
+
+Check .planning/ for partial output.
+Review error above and retry with /gsd:autopilot
+==========================================
+```
+
+Exit without proceeding to execution.
+
+**If planning succeeds:**
+```
+Planning complete. Proceeding to execution...
+```
+
+Continue to Step 3.
 </step>
 
 <step name="detect_resume" placeholder="true">
