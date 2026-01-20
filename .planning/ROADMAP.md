@@ -21,7 +21,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 7: Learnings Propagation** - Write discovered patterns to AGENTS.md across iterations
 - [x] **Phase 8: Upfront Planning** - Generate all PLAN.md files before autonomous execution begins
 - [x] **Phase 9: Mode Selection & Base Commands** - Interactive vs Lazy mode selection at startup
-- [ ] **Phase 10: Execution Commands** - Full command set for autonomous milestone execution
+- [ ] **Phase 10: Execution Commands** - Unified autopilot command for autonomous milestone execution
 
 ## Phase Details
 
@@ -164,22 +164,22 @@ Plans:
 - [x] 09-02-PLAN.md — Command updates (help.md mode labels, progress.md mode display, mode gating)
 
 ### Phase 10: Execution Commands
-**Goal**: Complete user-facing command set for autonomous execution
+**Goal**: Unified autopilot command for autonomous milestone execution
 **Depends on**: Phase 9
 **Requirements**: CMD-02, CMD-03, CMD-04
 **Success Criteria** (what must be TRUE):
-  1. `/gsd:plan-milestone-all` generates all plans for the milestone
-  2. `/gsd:ralph` configures retry loop settings (enable/disable, max iterations)
-  3. `/gsd:run-milestone` starts autonomous execution and runs until completion
-  4. Commands integrate with safety infrastructure from Phase 1
-  5. End-to-end workflow: plan-milestone-all -> ralph configure -> run-milestone
-**Plans**: TBD
+  1. `/gsd:autopilot` provides unified entry point for lazy mode execution
+  2. Autopilot prompts for settings (max iterations, timeout, thresholds) every run
+  3. Autopilot detects existing plans or triggers planning automatically
+  4. Autopilot detects incomplete runs and offers resume
+  5. Ctrl+C triggers graceful stop with resume instructions
+  6. End-to-end workflow: lazy-mode -> autopilot (plans if needed, then executes)
+**Plans**: 3 plans
 
 Plans:
-- [ ] 10-01: plan-milestone-all command
-- [ ] 10-02: ralph configuration command
-- [ ] 10-03: run-milestone command
-- [ ] 10-04: End-to-end integration testing
+- [ ] 10-01-PLAN.md — Config extension and autopilot command skeleton
+- [ ] 10-02-PLAN.md — Plan detection, resume detection, and execution orchestration
+- [ ] 10-03-PLAN.md — Documentation updates (help.md, progress.md)
 
 ## Progress
 
@@ -197,8 +197,8 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 7. Learnings Propagation | 2/2 | Complete | 2026-01-19 |
 | 8. Upfront Planning | 2/2 | Complete | 2026-01-19 |
 | 9. Mode Selection & Base Commands | 2/2 | Complete | 2026-01-20 |
-| 10. Execution Commands | 0/4 | Not started | - |
+| 10. Execution Commands | 0/3 | Planned | - |
 
 ---
 *Roadmap created: 2026-01-19*
-*Depth: Comprehensive (10 phases, 23 planned plans)*
+*Depth: Comprehensive (10 phases, 22 planned plans)*
