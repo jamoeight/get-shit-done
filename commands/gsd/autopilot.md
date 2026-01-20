@@ -185,40 +185,155 @@ Planning complete. Proceeding to execution...
 Continue to Step 3.
 </step>
 
-<step name="detect_resume" placeholder="true">
-**Step 3: Detect Incomplete Runs** (Plan 02)
+<step name="detect_resume">
+**Step 3: Detect Incomplete Runs**
 
-<!-- TODO: Implement in 10-02-PLAN.md
-- Check STATE.md for incomplete progress
-- If incomplete: prompt "Resume previous run?"
-- Track where execution stopped
--->
+Check STATE.md for prior incomplete execution.
 
-Placeholder - will be implemented in Plan 02.
+```bash
+# Check for iteration history with incomplete status
+if [[ -f ".planning/STATE.md" ]]; then
+    # Extract next action - if it's a plan ID (NN-MM), run is incomplete
+    NEXT_TASK=$(grep "^Description:" .planning/STATE.md | head -1 | grep -oE '[0-9]{2}-[0-9]{2}' || echo "")
+
+    if [[ -n "$NEXT_TASK" ]]; then
+        INCOMPLETE_RUN=true
+        echo "Incomplete run detected. Last position: $NEXT_TASK"
+    fi
+fi
+```
+
+**If incomplete run detected:**
+
+Prompt the user:
+```
+==========================================
+ INCOMPLETE RUN DETECTED
+==========================================
+
+Previous execution stopped at: {NEXT_TASK}
+
+Resume from this position or restart from the beginning?
+[resume/restart]
+```
+
+- If user selects "resume": Proceed with existing STATE.md position
+- If user selects "restart": Reset STATE.md position to first plan (01-01)
+
+**If no incomplete run:**
+
+Continue to Step 4 (fresh execution).
 </step>
 
-<step name="execute" placeholder="true">
-**Step 4: Execute** (Plan 02)
+<step name="execute">
+**Step 4: Start Execution**
 
-<!-- TODO: Implement in 10-02-PLAN.md
-- If no plans: run plan-milestone-all first
-- Then run ralph.sh with configured settings
-- Handle Ctrl+C gracefully
--->
+Display launch confirmation with settings summary:
 
-Placeholder - will be implemented in Plan 02.
+```
+==========================================
+ GSD AUTOPILOT - READY TO LAUNCH
+==========================================
+
+Mode: Lazy (autonomous)
+Plans: {count} across {phases} phases
+Settings:
+  - Max iterations: {MAX_ITERATIONS}
+  - Timeout: {TIMEOUT_HOURS}h
+  - Circuit breaker: {CIRCUIT_BREAKER_THRESHOLD} failures
+  - Stuck threshold: {STUCK_THRESHOLD} retries
+
+Starting autonomous execution...
+Press Ctrl+C at any time for graceful stop.
+==========================================
+```
+
+Execute ralph.sh via Bash tool:
+
+```bash
+./bin/ralph.sh 2>&1
+```
+
+Capture the exit status for Step 5 handling.
+
+**Exit codes from ralph.sh:**
+- 0 = COMPLETED (all plans done, tests pass)
+- 1 = STUCK (same task failed STUCK_THRESHOLD times)
+- 2 = ABORTED (user chose to abort or budget cap reached)
+- 3 = INTERRUPTED (user pressed Ctrl+C, graceful stop)
 </step>
 
-<step name="completion" placeholder="true">
-**Step 5: Handle Completion/Interruption** (Plan 02)
+<step name="completion">
+**Step 5: Handle Completion**
 
-<!-- TODO: Implement in 10-02-PLAN.md
-- On completion: show final summary
-- On interruption: show progress + resume command
-- Exit with appropriate code
--->
+Parse the exit status from ralph.sh and display appropriate completion message.
 
-Placeholder - will be implemented in Plan 02.
+**Exit 0 - COMPLETED:**
+```
+==========================================
+ GSD AUTOPILOT - COMPLETE
+==========================================
+
+All plans executed successfully!
+
+Next steps:
+- Review work in .planning/phases/
+- Run /gsd:progress for summary
+- Run /gsd:complete-milestone when ready
+==========================================
+```
+
+**Exit 1 - STUCK:**
+```
+==========================================
+ GSD AUTOPILOT - STUCK
+==========================================
+
+Execution stuck at: {task}
+Reason: Same task failed {STUCK_THRESHOLD} times
+
+Options:
+- Resume: /gsd:autopilot (will offer to resume)
+- Debug:  Review .planning/ralph.log for failure details
+- Skip:   Manually mark task complete in STATE.md, then resume
+==========================================
+```
+
+**Exit 2 - ABORTED:**
+```
+==========================================
+ GSD AUTOPILOT - ABORTED
+==========================================
+
+Execution aborted.
+Position saved: {task}
+
+All progress up to this point has been committed.
+
+Resume: /gsd:autopilot
+==========================================
+```
+
+**Exit 3 - INTERRUPTED:**
+```
+==========================================
+ GSD AUTOPILOT - INTERRUPTED
+==========================================
+
+Graceful stop completed.
+All progress committed.
+
+Position: {task}
+Completed: {N} iterations
+
+To continue from where you left off:
+  /gsd:autopilot
+
+The command will detect the incomplete run and offer to resume.
+==========================================
+```
+
+Return the exit status code so the calling context (Claude) can reference it.
 </step>
 
 </process>
@@ -227,5 +342,9 @@ Placeholder - will be implemented in Plan 02.
 <success_criteria>
 - [ ] Mode validated (lazy or unset, error on interactive)
 - [ ] All 4 settings prompted and saved to .ralph-config
-- [ ] Ready for Plan 02 to add detection and execution logic
+- [ ] Plan detection checks all phases have plans
+- [ ] Planning triggered via plan-milestone-all when plans missing
+- [ ] Resume detection checks STATE.md for incomplete runs
+- [ ] Execution via ralph.sh with all exit status handling
+- [ ] Clear completion/failure/interrupt messages with next steps
 </success_criteria>
