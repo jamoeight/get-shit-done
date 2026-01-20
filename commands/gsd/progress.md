@@ -150,6 +150,30 @@ Track:
 
 Find the first PLAN.md without matching SUMMARY.md.
 Read its `<objective>` section.
+Check GSD_MODE from .ralph-config (read in load step).
+
+**If mode is lazy:**
+
+```
+---
+
+## ▶ Next Up
+
+**{phase}-{plan}: [Plan Name]** — [objective summary from PLAN.md]
+
+`/gsd:autopilot` — Start autonomous execution
+
+<sub>`/clear` first → fresh context window</sub>
+
+---
+
+**Also available:**
+- `/gsd:execute-phase {phase}` — execute just this phase interactively
+
+---
+```
+
+**If mode is interactive or not set:**
 
 ```
 ---
@@ -282,6 +306,33 @@ State: "Current phase is {X}. Milestone has {N} phases (highest: {Y})."
 **Route C: Phase complete, more phases remain**
 
 Read ROADMAP.md to get the next phase's name and goal.
+Check GSD_MODE from .ralph-config (read in load step).
+
+**If mode is lazy:**
+
+```
+---
+
+## ✓ Phase {Z} Complete
+
+## ▶ Next Up
+
+**Phase {Z+1}: {Name}** — {Goal from ROADMAP.md}
+
+`/gsd:autopilot` — Continue autonomous execution
+
+<sub>`/clear` first → fresh context window</sub>
+
+---
+
+**Also available:**
+- `/gsd:plan-phase {Z+1}` — plan next phase manually
+- `/gsd:verify-work {Z}` — user acceptance test before continuing
+
+---
+```
+
+**If mode is interactive or not set:**
 
 ```
 ---
