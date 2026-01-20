@@ -10,17 +10,17 @@ See: .planning/PROJECT.md (updated 2026-01-19)
 ## Current Position
 
 Phase: 9 of 10 (Mode Selection & Base Commands)
-Plan: 0 of 2 in current phase
-Status: Ready for planning
-Last activity: 2026-01-19 - Completed Phase 8 (Upfront Planning)
+Plan: 1 of 2 in current phase
+Status: In progress
+Last activity: 2026-01-20 - Completed 09-01-PLAN.md (Mode Infrastructure)
 
-Progress: [########################      ] 80%
+Progress: [#########################     ] 85%
 
 ## Next Action
 
-Command: /gsd:discuss-phase 9
-Description: Gather context for Phase 9 (Mode Selection)
-Read: ROADMAP.md
+Command: /gsd:execute-phase 9
+Description: Execute remaining plan (09-02) for Phase 9
+Read: 09-02-PLAN.md
 
 
 ## Planning Progress
@@ -44,9 +44,9 @@ Read: ROADMAP.md
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 17
-- Average duration: ~4.1 min
-- Total execution time: ~69 minutes
+- Total plans completed: 18
+- Average duration: ~4 min
+- Total execution time: ~72 minutes
 
 **By Phase:**
 
@@ -60,9 +60,10 @@ Read: ROADMAP.md
 | 6 - Circuit Breaker | 2/2 | ~8 min | ~4 min |
 | 7 - Learnings Propagation | 2/2 | ~8 min | ~4 min |
 | 8 - Upfront Planning | 2/2 | ~11 min | ~5.5 min |
+| 9 - Mode Selection | 1/2 | ~3 min | ~3 min |
 
 **Recent Trend:**
-- Last 5 plans: 06-02 (4m), 07-01 (4m), 07-02 (4m), 08-01 (8m), 08-02 (3m)
+- Last 5 plans: 07-01 (4m), 07-02 (4m), 08-01 (8m), 08-02 (3m), 09-01 (3m)
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -130,6 +131,10 @@ Recent decisions affecting current work:
 - Dependency warnings before plan refinement
 - User exits refinement loop by typing proceed/done/ready
 - Refinement uses revision mode for targeted plan updates (not full replan)
+- Mode stored in .ralph-config (not STATE.md) - keeps STATE.md focused on progress
+- Toggle behavior: empty -> lazy -> interactive -> lazy (for /gsd:lazy-mode)
+- Mid-milestone mode switching allowed with warning (not blocked)
+- require_mode() returns error code, caller handles exit (per project convention)
 
 ### Pending Todos
 
@@ -141,6 +146,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-01-19
-Stopped at: Phase 8 verified, ready for Phase 9
+Last session: 2026-01-20
+Stopped at: Completed 09-01-PLAN.md (Mode Infrastructure)
 Resume file: None
