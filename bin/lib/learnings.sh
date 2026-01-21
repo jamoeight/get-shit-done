@@ -655,6 +655,61 @@ enforce_failure_cap() {
     return 0
 }
 
+# clear_phase_failures - Remove all failure entries for a specific phase
+# Args: phase_num - Phase number to clear
+# Returns: 0 always
+#
+# Removes entire ### Phase N: subsection from ## Failure Context
+# Called when phase boundary is crossed (phase completes successfully)
+clear_phase_failures() {
+    local phase_num="$1"
+
+    # Remove leading zeros
+    phase_num=$((10#$phase_num))
+
+    if [[ ! -f "$AGENTS_FILE" ]]; then
+        return 0  # No file, nothing to clear
+    fi
+
+    # Create temp file for atomic write
+    local temp
+    temp=$(mktemp)
+
+    # Use awk to remove the ### Phase N: subsection from ## Failure Context
+    awk -v phase="${phase_num}" '
+        BEGIN {
+            in_failure = 0
+            in_phase = 0
+        }
+        # Track when we enter Failure Context section
+        /^## Failure Context/ {
+            in_failure = 1
+            print
+            next
+        }
+        # Track when we exit Failure Context section
+        /^## / && in_failure {
+            in_failure = 0
+            in_phase = 0
+        }
+        # Found the phase subsection to remove
+        $0 == "### Phase " phase ":" && in_failure {
+            in_phase = 1
+            next
+        }
+        # Exit the phase subsection when we hit another subsection or section
+        ((/^### Phase/ && $0 != "### Phase " phase ":") || /^## /) && in_phase {
+            in_phase = 0
+        }
+        # Print line if we are not inside the phase subsection
+        !in_phase { print }
+    ' "$AGENTS_FILE" > "$temp"
+
+    # Atomic replace
+    mv "$temp" "$AGENTS_FILE"
+    return 0
+}
+
 # =============================================================================
 # Size Management Functions
 # =============================================================================
