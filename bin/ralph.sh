@@ -87,6 +87,25 @@ handle_iteration_success() {
     local next_plan
     next_plan=$(get_next_plan_after "$task")
 
+    # Check for phase boundary - clear failure learnings when phase completes
+    if type clear_phase_failures &>/dev/null; then
+        local current_phase="${task%%-*}"
+        current_phase=$((10#$current_phase))  # Remove leading zero
+
+        if [[ "$next_plan" == "COMPLETE" ]]; then
+            # All phases done - clear current phase failures
+            clear_phase_failures "$current_phase"
+        else
+            local next_phase="${next_plan%%-*}"
+            next_phase=$((10#$next_phase))
+
+            if [[ "$next_phase" -gt "$current_phase" ]]; then
+                # Phase boundary crossed - clear completed phase failures
+                clear_phase_failures "$current_phase"
+            fi
+        fi
+    fi
+
     if [[ "$next_plan" == "COMPLETE" ]]; then
         # All plans done - update next action to reflect completion
         update_next_action "COMPLETE" "COMPLETE" "All plans executed"
