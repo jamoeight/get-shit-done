@@ -7,6 +7,23 @@
 
 const { spawn } = require('child_process');
 const path = require('path');
+const os = require('os');
+
+// Get the installed ralph.sh location (relative to this file)
+// When installed: ~/.claude/get-shit-done/bin/lib/terminal-launcher.js
+// ralph.sh is at: ~/.claude/get-shit-done/bin/ralph.sh
+const RALPH_SCRIPT = path.join(__dirname, '..', 'ralph.sh');
+
+// Convert Windows path to Git Bash path (C:/Users/... → /c/Users/...)
+function toGitBashPath(windowsPath) {
+  const normalized = windowsPath.replace(/\\/g, '/');
+  // Match drive letter pattern like C:/ or D:/
+  const match = normalized.match(/^([A-Za-z]):\//);
+  if (match) {
+    return '/' + match[1].toLowerCase() + normalized.slice(2);
+  }
+  return normalized;
+}
 
 // command-exists for checking terminal availability
 let commandExistsSync;
@@ -54,7 +71,7 @@ function findTerminal(platform) {
 
 function launchCmd() {
   const cwd = process.cwd();
-  const script = path.join(cwd, 'bin', 'ralph.sh').replace(/\\/g, '/');
+  const script = toGitBashPath(RALPH_SCRIPT);
 
   return spawn('cmd.exe', ['/c', 'start', 'cmd', '/k', `bash "${script}"`], {
     detached: true,
@@ -66,7 +83,8 @@ function launchCmd() {
 
 function launchPowerShell() {
   const cwd = process.cwd();
-  const script = path.join(cwd, 'bin', 'ralph.sh').replace(/\\/g, '/');
+  const script = toGitBashPath(RALPH_SCRIPT);
+  const bashCwd = toGitBashPath(cwd);
 
   return spawn('powershell.exe', [
     '-Command', 'Start-Process', 'powershell',
@@ -81,7 +99,7 @@ function launchPowerShell() {
 
 function launchWindowsTerminal() {
   const cwd = process.cwd();
-  const script = path.join(cwd, 'bin', 'ralph.sh').replace(/\\/g, '/');
+  const script = toGitBashPath(RALPH_SCRIPT);
 
   return spawn('wt.exe', [
     '--title', 'GSD Ralph',
@@ -96,11 +114,12 @@ function launchWindowsTerminal() {
 
 function launchGitBash() {
   const cwd = process.cwd();
-  const script = path.join(cwd, 'bin', 'ralph.sh').replace(/\\/g, '/');
+  const script = toGitBashPath(RALPH_SCRIPT);
+  const bashCwd = toGitBashPath(cwd);
 
   return spawn('cmd.exe', [
     '/c', 'start', '""', 'bash', '--login', '-i', '-c',
-    `cd "${cwd.replace(/\\/g, '/')}" && bash "${script}"`
+    `cd "${bashCwd}" && bash "${script}"`
   ], {
     detached: true,
     stdio: 'ignore',
@@ -111,7 +130,7 @@ function launchGitBash() {
 
 function launchMacTerminal() {
   const cwd = process.cwd();
-  const script = path.join(cwd, 'bin', 'ralph.sh');
+  const script = RALPH_SCRIPT;
 
   // Escape for AppleScript
   const escapedCwd = cwd.replace(/"/g, '\\"');
@@ -131,7 +150,7 @@ end tell`;
 
 function launchGnomeTerminal() {
   const cwd = process.cwd();
-  const script = path.join(cwd, 'bin', 'ralph.sh');
+  const script = RALPH_SCRIPT;
 
   return spawn('gnome-terminal', [
     '--window',
@@ -147,7 +166,7 @@ function launchGnomeTerminal() {
 
 function launchXterm() {
   const cwd = process.cwd();
-  const script = path.join(cwd, 'bin', 'ralph.sh');
+  const script = RALPH_SCRIPT;
 
   return spawn('xterm', [
     '-hold',
@@ -168,7 +187,7 @@ function launchXtermEmulator() {
 
 function showManualInstructions(platform) {
   const cwd = process.cwd();
-  const script = path.join(cwd, 'bin', 'ralph.sh');
+  const script = RALPH_SCRIPT;
 
   console.log('\n==========================================');
   console.log(' TERMINAL LAUNCH UNAVAILABLE');

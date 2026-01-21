@@ -25,11 +25,11 @@ This command:
 
 
 <context>
-@bin/lib/budget.sh
-@bin/lib/mode.sh
-@bin/lib/parse.sh
-@bin/ralph.sh
-@commands/gsd/plan-milestone-all.md
+@~/.claude/get-shit-done/bin/lib/budget.sh
+@~/.claude/get-shit-done/bin/lib/mode.sh
+@~/.claude/get-shit-done/bin/lib/parse.sh
+@~/.claude/get-shit-done/bin/ralph.sh
+@~/.claude/commands/gsd/plan-milestone-all.md
 </context>
 
 
@@ -76,7 +76,7 @@ Use prompt_all_settings pattern from budget.sh:
 
 ```bash
 # Source budget library
-source bin/lib/budget.sh
+source $HOME/.claude/get-shit-done/bin/lib/budget.sh
 
 # Load existing config as defaults, then prompt for all 4 settings
 prompt_all_settings
@@ -252,12 +252,12 @@ Launching ralph.sh in new terminal window...
 Use the terminal-launcher module to spawn ralph.sh in a detached terminal:
 
 ```bash
-node bin/lib/terminal-launcher.js
+node $HOME/.claude/get-shit-done/bin/lib/terminal-launcher.js
 ```
 
 Alternatively via Node.js in Bash tool:
 ```bash
-node -e "const launcher = require('./bin/lib/terminal-launcher.js'); const result = launcher.launchTerminal(); process.exit(result.success ? 0 : 1);"
+node -e "const launcher = require(process.env.HOME + '/.claude/get-shit-done/bin/lib/terminal-launcher.js'); const result = launcher.launchTerminal(); process.exit(result.success ? 0 : 1);"
 ```
 
 **Capture the result:**

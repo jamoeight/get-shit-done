@@ -346,6 +346,34 @@ function install(isGlobal) {
     }
   }
 
+  // Copy autopilot infrastructure (ralph.sh and bin/lib/*.sh, *.js)
+  const ralphSrc = path.join(src, 'bin', 'ralph.sh');
+  const libSrc = path.join(src, 'bin', 'lib');
+  if (fs.existsSync(ralphSrc) && fs.existsSync(libSrc)) {
+    const binDest = path.join(claudeDir, 'get-shit-done', 'bin');
+    const libDest = path.join(binDest, 'lib');
+    fs.mkdirSync(libDest, { recursive: true });
+
+    // Copy ralph.sh
+    fs.copyFileSync(ralphSrc, path.join(binDest, 'ralph.sh'));
+
+    // Copy all files in bin/lib (shell libraries and terminal-launcher.js)
+    const libEntries = fs.readdirSync(libSrc);
+    for (const entry of libEntries) {
+      const srcFile = path.join(libSrc, entry);
+      if (fs.statSync(srcFile).isFile()) {
+        fs.copyFileSync(srcFile, path.join(libDest, entry));
+      }
+    }
+
+    if (verifyFileInstalled(path.join(binDest, 'ralph.sh'), 'bin/ralph.sh') &&
+        verifyInstalled(libDest, 'bin/lib')) {
+      console.log(`  ${green}✓${reset} Installed autopilot infrastructure`);
+    } else {
+      failures.push('autopilot infrastructure');
+    }
+  }
+
   // Write VERSION file for whats-new command
   const versionDest = path.join(claudeDir, 'get-shit-done', 'VERSION');
   fs.writeFileSync(versionDest, pkg.version);
