@@ -482,6 +482,179 @@ extract_failure_reason() {
     return 0
 }
 
+# append_failure_learning - Add failure learning to AGENTS.md
+# Args: task_id - Task ID (e.g., "12-01")
+#       error_msg - Error message
+#       attempted - What was attempted (2-3 sentences)
+#       files - Relevant file paths
+#       context - Additional context
+# Returns: 0 on success, 1 on invalid args
+#
+# Stores structured failure entry with timestamp under phase subsection
+# Enforces 100-failure cap per phase before appending
+append_failure_learning() {
+    local task_id="$1"
+    local error_msg="$2"
+    local attempted="$3"
+    local files="$4"
+    local context="$5"
+
+    if [[ -z "$task_id" || -z "$error_msg" ]]; then
+        echo -e "${LEARN_RED}Error: append_failure_learning requires task_id and error_msg${LEARN_RESET}" >&2
+        return 1
+    fi
+
+    # Extract phase number from task_id (e.g., "12-01" -> 12)
+    local phase_num="${task_id%%-*}"
+    phase_num=$((10#$phase_num))  # Remove leading zeros
+
+    # Generate timestamp
+    local timestamp
+    timestamp=$(date '+%Y-%m-%d %H:%M:%S' 2>/dev/null || echo "unknown")
+
+    # Escape special characters for awk/sed safety
+    # Replace & with \&, backslash with \\, single quote with '\''
+    error_msg=$(echo "$error_msg" | sed "s/&/\\\\&/g; s/'/'\\\\''/g")
+    attempted=$(echo "$attempted" | sed "s/&/\\\\&/g; s/'/'\\\\''/g")
+    context=$(echo "$context" | sed "s/&/\\\\&/g; s/'/'\\\\''/g")
+
+    # Format the failure entry (multi-line markdown)
+    local entry="- [${task_id} | ${timestamp}] **Error:** ${error_msg}
+  **Attempted:** ${attempted}
+  **Files:** ${files}
+  **Context:** ${context}"
+
+    # Ensure AGENTS.md exists with Failure Context section
+    ensure_failure_section
+
+    # Check and enforce failure cap before appending
+    enforce_failure_cap "$phase_num"
+
+    # Create temp file for atomic write
+    local temp
+    temp=$(mktemp)
+
+    local subsection_header="### Phase ${phase_num}:"
+
+    # Check if subsection exists
+    if grep -q "^${subsection_header}$" "$AGENTS_FILE" 2>/dev/null; then
+        # Subsection exists - append to end of subsection
+        awk -v header="$subsection_header" -v entry="$entry" '
+            BEGIN { in_section = 0; added = 0 }
+            $0 == header { in_section = 1; print; next }
+            in_section && /^### / && !added {
+                # Hit next subsection - insert before it
+                print ""
+                print entry
+                print ""
+                added = 1
+                in_section = 0
+                print
+                next
+            }
+            in_section && /^## / && !added {
+                # Hit next section - insert before it
+                print ""
+                print entry
+                print ""
+                added = 1
+                in_section = 0
+                print
+                next
+            }
+            { print }
+            END {
+                # If we reached EOF while in section, append at end
+                if (in_section && !added) {
+                    print ""
+                    print entry
+                }
+            }
+        ' "$AGENTS_FILE" > "$temp"
+    else
+        # Subsection doesn't exist - create it under Failure Context
+        awk -v header="$subsection_header" -v entry="$entry" '
+            BEGIN { in_failure = 0; added = 0 }
+            /^## Failure Context/ {
+                in_failure = 1
+                print
+                next
+            }
+            in_failure && /^## / && !added {
+                # Hit next section - insert subsection before it
+                print ""
+                print header
+                print ""
+                print entry
+                print ""
+                added = 1
+                in_failure = 0
+                print
+                next
+            }
+            { print }
+            END {
+                # If we reached EOF while in failure context, append at end
+                if (in_failure && !added) {
+                    print ""
+                    print header
+                    print ""
+                    print entry
+                }
+            }
+        ' "$AGENTS_FILE" > "$temp"
+    fi
+
+    # Atomic replace
+    mv "$temp" "$AGENTS_FILE"
+    return $?
+}
+
+# enforce_failure_cap - Enforce 100-failure limit per phase
+# Args: phase_num - Phase number to enforce cap for
+# Returns: 0 always
+#
+# Drops oldest failure if count >= 100 for this phase
+enforce_failure_cap() {
+    local phase_num="$1"
+
+    if [[ ! -f "$AGENTS_FILE" ]]; then
+        return 0  # No file, nothing to enforce
+    fi
+
+    local max_failures=100
+
+    # Count failures for this phase
+    local count
+    count=$(grep -c "^- \[${phase_num}-" "$AGENTS_FILE" 2>/dev/null || echo "0")
+    # Remove any whitespace/newlines
+    count=$(echo "$count" | tr -d '[:space:]')
+
+    if [[ "$count" -lt "$max_failures" ]]; then
+        return 0  # Under cap, nothing to do
+    fi
+
+    # Drop oldest failure (first match for this phase)
+    local temp
+    temp=$(mktemp)
+
+    awk -v phase="${phase_num}" '
+        BEGIN { dropped = 0 }
+        /^- \[/ && $0 ~ "^- \\[" phase "-" && dropped == 0 {
+            # Skip this line (drop oldest)
+            # Also skip the next 3 lines (the multi-line entry continuation)
+            dropped = 1
+            getline; getline; getline
+            next
+        }
+        { print }
+    ' "$AGENTS_FILE" > "$temp"
+
+    # Atomic replace
+    mv "$temp" "$AGENTS_FILE"
+    return 0
+}
+
 # =============================================================================
 # Size Management Functions
 # =============================================================================
