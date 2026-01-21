@@ -206,11 +206,11 @@ Plans:
   3. If no supported terminal is detected, autopilot displays manual run instructions instead of failing
   4. Ralph.sh continues running independently after autopilot returns control to user
   5. User can close the original Claude session without stopping ralph.sh execution
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 11-01-PLAN.md - TBD
-- [ ] 11-02-PLAN.md - TBD
+- [ ] 11-01-PLAN.md — Terminal launcher module with platform detection and detached spawning
+- [ ] 11-02-PLAN.md — Autopilot integration and end-to-end verification
 
 ### Phase 12: Failure Learnings
 **Goal**: Capture and propagate failure context so retries learn from mistakes
@@ -247,7 +247,7 @@ Phases execute in numeric order: 1 -> 2 -> ... -> 10 -> 11 -> 12
 | 8. Upfront Planning | 2/2 | Complete | 2026-01-19 |
 | 9. Mode Selection & Base Commands | 2/2 | Complete | 2026-01-20 |
 | 10. Execution Commands | 3/3 | Complete | 2026-01-20 |
-| 11. Terminal Launcher | 0/? | Pending | - |
+| 11. Terminal Launcher | 0/2 | Pending | - |
 | 12. Failure Learnings | 0/? | Pending | - |
 
 ---
