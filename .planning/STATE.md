@@ -5,22 +5,22 @@
 See: .planning/PROJECT.md (updated 2026-01-20)
 
 **Core value:** Plan once, walk away, wake up to done.
-**Current focus:** v1.0 complete — preparing for v1.1
+**Current focus:** v1.1 Execution Isolation & Failure Learnings
 
 ## Current Position
 
-Phase: Complete
-Plan: N/A
-Status: Milestone v1.0 shipped
-Last activity: 2026-01-20 - v1.0 milestone archived
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-01-20 — Milestone v1.1 started
 
-Progress: [##############################] 100% (v1.0)
+Progress: [░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 0% (v1.1)
 
 ## Next Action
 
-Command: /gsd:new-milestone
-Description: Start v1.1 planning (execution isolation, failure learnings)
-Read: PROJECT.md, MILESTONES.md
+Command: /gsd:plan-phase or /gsd:discuss-phase
+Description: Plan first phase after requirements/roadmap defined
+Read: REQUIREMENTS.md, ROADMAP.md
 
 ## Milestone History
 
@@ -28,14 +28,8 @@ Read: PROJECT.md, MILESTONES.md
 |---------|------|--------|---------|
 | v1.0 | Lazy Mode MVP | 1-10 (22 plans) | 2026-01-20 |
 
-## v1.1 Backlog
-
-- EXEC-01: Auto-launch terminal for ralph.sh
-- EXEC-02: Cross-platform terminal detection
-- REC-04: Failure learnings propagation
-
 ## Session Continuity
 
 Last session: 2026-01-20
-Stopped at: v1.0 milestone complete
+Stopped at: Starting v1.1 milestone
 Resume file: None

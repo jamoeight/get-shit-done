@@ -32,8 +32,17 @@ Plan once, walk away, wake up to done. No human needed at the computer after pla
 ### Active
 
 - [ ] Auto-launch terminal for ralph.sh (execution isolation)
-- [ ] Failure learnings propagation (retry context from failed attempts)
-- [ ] Cross-platform terminal detection
+- [ ] Cross-platform terminal detection (Windows/macOS/Linux)
+- [ ] Failure learnings propagation (extract failure context for retries)
+
+## Current Milestone: v1.1 Execution Isolation & Failure Learnings
+
+**Goal:** Prevent Claude from executing directly by auto-launching ralph.sh in a separate terminal, and improve retry intelligence by propagating failure learnings.
+
+**Target features:**
+- Auto-launch terminal window when /gsd:autopilot runs
+- Cross-platform terminal detection (cmd, PowerShell, Git Bash, Terminal.app, gnome-terminal, etc.)
+- Extract failure reasons from failed tasks and add structured context to AGENTS.md for retries
 
 ### Out of Scope
 
@@ -71,4 +80,4 @@ Plan once, walk away, wake up to done. No human needed at the computer after pla
 | Learnings from successes only (v1.0) | Simpler implementation, failure learnings deferred to v1.1 | ⚠️ Revisit |
 
 ---
-*Last updated: 2026-01-20 after v1.0 milestone*
+*Last updated: 2026-01-20 after starting v1.1 milestone*
