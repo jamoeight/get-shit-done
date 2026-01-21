@@ -32,6 +32,7 @@ source "${SCRIPT_DIR}/lib/learnings.sh"
 
 # Log file configuration
 LOG_FILE="${LOG_FILE:-.planning/ralph.log}"
+PAUSE_FILE="${PAUSE_FILE:-.planning/.pause}"
 
 # =============================================================================
 # Logging Functions
@@ -188,6 +189,20 @@ extract_and_store_failure() {
     append_failure_learning "$task_id" "$error_msg" "$attempted" "$files" "$context"
 }
 
+# check_pause - Wait while pause file exists
+# Returns when pause file is removed or loop is interrupted
+check_pause() {
+    if [[ -f "$PAUSE_FILE" ]]; then
+        echo -e "${YELLOW}=== PAUSED ===${RESET}"
+        echo -e "Pause file detected: $PAUSE_FILE"
+        echo -e "Waiting for resume (delete $PAUSE_FILE or press 'r' in progress watcher)..."
+        while [[ -f "$PAUSE_FILE" ]]; do
+            sleep 2
+        done
+        echo -e "${GREEN}=== RESUMED ===${RESET}"
+    fi
+}
+
 # =============================================================================
 # Argument Parsing
 # =============================================================================
@@ -309,6 +324,9 @@ skip_phase_num=""
 skip_plan_name=""
 while true; do
     iteration=$((iteration + 1))
+
+    # Check for pause signal at start of iteration
+    check_pause
 
     # Check budget limits
     if ! check_limits "$iteration"; then
@@ -500,6 +518,9 @@ while true; do
                 ;;
         esac
     fi
+
+    # Check for pause signal at end of iteration (safe point)
+    check_pause
 
     # Check for deferred interrupt at end of iteration (safe point)
     if check_interrupted; then
