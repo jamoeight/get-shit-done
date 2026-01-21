@@ -21,6 +21,12 @@ Provides situational awareness before continuing work.
 <step name="verify">
 **Verify planning structure exists:**
 
+Use Bash (not Glob) to check—Glob respects .gitignore but .planning/ is often gitignored:
+
+```bash
+test -d .planning && echo "exists" || echo "missing"
+```
+
 If no `.planning/` directory:
 
 ```
@@ -47,6 +53,7 @@ If missing both ROADMAP.md and PROJECT.md: suggest `/gsd:new-project`.
 - Read `.planning/ROADMAP.md` for phase structure and objectives
 - Read `.planning/PROJECT.md` for current state (What This Is, Core Value, Requirements)
 - Read `.planning/.ralph-config` for GSD_MODE (if exists)
+- Read `.planning/config.json` for settings (model_profile, workflow toggles)
   </step>
 
 <step name="recent">
@@ -75,6 +82,7 @@ If missing both ROADMAP.md and PROJECT.md: suggest `/gsd:new-project`.
 # [Project Name]
 
 **Progress:** [████████░░] 8/10 plans complete
+**Profile:** [quality/balanced/budget]
 
 ## Mode
 [Interactive | Lazy | Not Set] — `/gsd:lazy-mode` to change

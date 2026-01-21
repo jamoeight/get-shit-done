@@ -5,6 +5,10 @@ TO-DOS.md
 CLAUDE.md
 # .planning - tracked for GSD development
 /research.claude/
+commands.html
 
 # Local test installs
 .claude/
+
+# Build artifacts (committed to npm, not git)
+hooks/dist/

@@ -87,6 +87,17 @@ Map an existing codebase for brownfield projects.
 
 Usage: `/gsd:map-codebase`
 
+**`/gsd:analyze-codebase`**
+Bootstrap codebase intelligence for existing projects.
+
+- Scans all JS/TS files and extracts exports/imports
+- Detects naming conventions, directory patterns, file suffixes
+- Creates `.planning/intel/` with index, conventions, and summary
+- Works standalone (no `/gsd:new-project` required)
+- After initial scan, PostToolUse hook continues incremental learning
+
+Usage: `/gsd:analyze-codebase`
+
 ### Phase Planning
 
 **`/gsd:discuss-phase <number>`** (interactive)
@@ -153,6 +164,21 @@ Start autonomous milestone execution. Combines settings configuration, plan dete
 - Detects incomplete runs and offers resume
 - Executes until completion or interruption
 - Handles Ctrl+C gracefully with resume info
+
+### Quick Mode
+
+**`/gsd:quick`**
+Execute small, ad-hoc tasks with GSD guarantees but skip optional agents.
+
+Quick mode uses the same system with a shorter path:
+- Spawns planner + executor (skips researcher, checker, verifier)
+- Quick tasks live in `.planning/quick/` separate from planned phases
+- Updates STATE.md tracking (not ROADMAP.md)
+
+Use when you know exactly what to do and the task is small enough to not need research or verification.
+
+Usage: `/gsd:quick`
+Result: Creates `.planning/quick/NNN-slug/PLAN.md`, `.planning/quick/NNN-slug/SUMMARY.md`
 
 ### Roadmap Management
 
@@ -284,6 +310,73 @@ List pending todos and select one to work on.
 Usage: `/gsd:check-todos`
 Usage: `/gsd:check-todos api`
 
+### User Acceptance Testing
+
+**`/gsd:verify-work [phase]`**
+Validate built features through conversational UAT.
+
+- Extracts testable deliverables from SUMMARY.md files
+- Presents tests one at a time (yes/no responses)
+- Automatically diagnoses failures and creates fix plans
+- Ready for re-execution if issues found
+
+Usage: `/gsd:verify-work 3`
+
+### Milestone Auditing
+
+**`/gsd:audit-milestone [version]`**
+Audit milestone completion against original intent.
+
+- Reads all phase VERIFICATION.md files
+- Checks requirements coverage
+- Spawns integration checker for cross-phase wiring
+- Creates MILESTONE-AUDIT.md with gaps and tech debt
+
+Usage: `/gsd:audit-milestone`
+
+**`/gsd:plan-milestone-gaps`**
+Create phases to close gaps identified by audit.
+
+- Reads MILESTONE-AUDIT.md and groups gaps into phases
+- Prioritizes by requirement priority (must/should/nice)
+- Adds gap closure phases to ROADMAP.md
+- Ready for `/gsd:plan-phase` on new phases
+
+Usage: `/gsd:plan-milestone-gaps`
+
+### Configuration
+
+**`/gsd:settings`**
+Configure workflow toggles and model profile interactively.
+
+- Toggle researcher, plan checker, verifier agents
+- Select model profile (quality/balanced/budget)
+- Updates `.planning/config.json`
+
+Usage: `/gsd:settings`
+
+**`/gsd:set-profile <profile>`**
+Quick switch model profile for GSD agents.
+
+- `quality` — Opus everywhere except verification
+- `balanced` — Opus for planning, Sonnet for execution (default)
+- `budget` — Sonnet for writing, Haiku for research/verification
+
+Usage: `/gsd:set-profile budget`
+
+### Codebase Intelligence
+
+**`/gsd:query-intel <type> [path]`**
+Query the codebase intelligence graph database.
+
+- `dependents <file>` — What files depend on this? (blast radius)
+- `hotspots` — Which files have the most dependents?
+
+Requires `/gsd:analyze-codebase` to build the graph first.
+
+Usage: `/gsd:query-intel dependents src/lib/db.ts`
+Usage: `/gsd:query-intel hotspots`
+
 ### Utility Commands
 
 **`/gsd:help`**
@@ -299,6 +392,15 @@ See what's changed since your installed version.
 
 Usage: `/gsd:whats-new`
 
+**`/gsd:update`**
+Update GSD to latest version with changelog preview.
+
+- Shows what changed before updating
+- Confirms before running install
+- Better than raw `npx get-shit-done-cc`
+
+Usage: `/gsd:update`
+
 ## Files & Structure
 
 ```
@@ -312,6 +414,10 @@ Usage: `/gsd:whats-new`
 │   └── done/             # Completed todos
 ├── debug/                # Active debug sessions
 │   └── resolved/         # Archived resolved issues
+├── intel/                # Codebase intelligence (auto-populated)
+│   ├── index.json        # File exports and imports
+│   ├── conventions.json  # Detected patterns
+│   └── summary.md        # Context for session injection
 ├── codebase/             # Codebase map (brownfield projects)
 │   ├── STACK.md          # Languages, frameworks, dependencies
 │   ├── ARCHITECTURE.md   # Patterns, layers, data flow
@@ -344,6 +450,33 @@ Usage: `/gsd:whats-new`
 - Human returns to completed work
 
 Toggle between modes: `/gsd:lazy-mode`
+
+## Planning Configuration
+
+Configure how planning artifacts are managed in `.planning/config.json`:
+
+**`planning.commit_docs`** (default: `true`)
+- `true`: Planning artifacts committed to git (standard workflow)
+- `false`: Planning artifacts kept local-only, not committed
+
+When `commit_docs: false`:
+- Add `.planning/` to your `.gitignore`
+- Useful for OSS contributions, client projects, or keeping planning private
+- All planning files still work normally, just not tracked in git
+
+**`planning.search_gitignored`** (default: `false`)
+- `true`: Add `--no-ignore` to broad ripgrep searches
+- Only needed when `.planning/` is gitignored and you want project-wide searches to include it
+
+Example config:
+```json
+{
+  "planning": {
+    "commit_docs": false,
+    "search_gitignored": true
+  }
+}
+```
 
 ## Common Workflows
 
