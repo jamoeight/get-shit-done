@@ -29,6 +29,7 @@ source "${SCRIPT_DIR}/lib/checkpoint.sh"
 source "${SCRIPT_DIR}/lib/exit.sh"
 source "${SCRIPT_DIR}/lib/recovery.sh"
 source "${SCRIPT_DIR}/lib/learnings.sh"
+source "${SCRIPT_DIR}/lib/path-resolve.sh"
 
 # Log file configuration
 LOG_FILE="${LOG_FILE:-.planning/ralph.log}"
