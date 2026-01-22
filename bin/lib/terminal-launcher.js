@@ -160,12 +160,16 @@ function launchPowerShellNode(scriptPath, windowTitle = 'GSD') {
 }
 
 function launchWindowsTerminal(scriptPath, windowTitle = 'GSD') {
+  const gitBashPath = findGitBash();
+
+  if (!gitBashPath) {
+    // Git Bash not found - signal to findTerminal() to try next terminal
+    return null;
+  }
+
   const cwd = process.cwd();
   const bashScript = toGitBashPath(scriptPath);
   const bashCwd = toGitBashPath(cwd);
-
-  // Use Git Bash explicitly via its standard install path
-  const gitBashPath = 'C:\\Program Files\\Git\\bin\\bash.exe';
 
   return spawn('wt.exe', [
     '--title', windowTitle,
@@ -179,12 +183,16 @@ function launchWindowsTerminal(scriptPath, windowTitle = 'GSD') {
 }
 
 function launchWindowsTerminalNode(scriptPath, windowTitle = 'GSD') {
+  const gitBashPath = findGitBash();
+
+  if (!gitBashPath) {
+    // Git Bash not found - signal to findTerminal() to try next terminal
+    return null;
+  }
+
   const cwd = process.cwd();
   const bashScript = toGitBashPath(scriptPath);
   const bashCwd = toGitBashPath(cwd);
-
-  // Use Git Bash explicitly via its standard install path
-  const gitBashPath = 'C:\\Program Files\\Git\\bin\\bash.exe';
 
   return spawn('wt.exe', [
     '--title', windowTitle,
