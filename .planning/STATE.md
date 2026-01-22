@@ -42,6 +42,11 @@ Read: .planning/PROJECT.md for project context
 
 Decisions from v1.2 archived to .planning/milestones/v1.2-ROADMAP.md
 
+## Iteration History
+
+<!-- HISTORY_START -->
+<!-- HISTORY_END -->
+
 ## Session Continuity
 
 Last session: 2026-01-21
