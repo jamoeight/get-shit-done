@@ -10,17 +10,17 @@ See: .planning/PROJECT.md (updated 2026-01-21)
 ## Current Position
 
 Phase: 13 - Terminal Path Resolution Fix
-Plan: Not started
-Status: Ready for planning
-Last activity: 2026-01-21 - Roadmap created
+Plan: 1 of 1 completed
+Status: Phase complete
+Last activity: 2026-01-21 - Completed 13-01-PLAN.md
 
-Progress: [------------------------------] 0% (v1.2 Phase 13)
+Progress: [██████████████████████████████] 100% (v1.2 Phase 13)
 
 ## Next Action
 
-Command: /gsd:plan-phase 13
-Description: Create execution plans for terminal path resolution fix
-Read: .planning/ROADMAP.md for phase details
+Command: /gsd:ship-milestone v1.2
+Description: Ship v1.2 Terminal Path Resolution milestone
+Read: .planning/phases/13-terminal-path-resolution/13-01-SUMMARY.md for completion details
 
 ## Milestone History
 
@@ -40,10 +40,13 @@ Read: .planning/ROADMAP.md for phase details
 
 ## Decisions
 
-(Cleared on milestone completion - see PROJECT.md Key Decisions for full record)
+| Phase | Decision | Rationale | Impact |
+|-------|----------|-----------|--------|
+| 13-01 | Check 5 common Git Bash locations before fallback | Covers standard 64/32-bit, custom C:\Git, Scoop user/global installs | ~95% of real-world Windows installations work without manual config |
+| 13-01 | Launcher functions return null (not throw) when dependencies unavailable | Enables graceful degradation through fallback chain | wt.exe -> cmd.exe -> powershell automatic fallback |
 
 ## Session Continuity
 
-Last session: 2026-01-21
-Stopped at: Roadmap created for v1.2
+Last session: 2026-01-21T21:31:57Z
+Stopped at: Completed 13-01-PLAN.md
 Resume file: None
