@@ -5,22 +5,22 @@
 See: .planning/PROJECT.md (updated 2026-01-21)
 
 **Core value:** Plan once, walk away, wake up to done.
-**Current focus:** Planning next milestone
+**Current focus:** v1.2 Terminal Path Resolution
 
 ## Current Position
 
-Phase: 12 of 12 (v1.1 complete)
-Plan: Complete
-Status: Milestone shipped
-Last activity: 2026-01-21 - Completed quick-003 (fix ralph.sh path bug)
+Phase: 13 - Terminal Path Resolution Fix
+Plan: Not started
+Status: Ready for planning
+Last activity: 2026-01-21 - Roadmap created
 
-Progress: [██████████████████████████████] 100% (12/12 phases, 26/26 plans)
+Progress: [------------------------------] 0% (v1.2 Phase 13)
 
 ## Next Action
 
-Command: /gsd:new-milestone
-Description: Start v2.0 planning (questioning → research → requirements → roadmap)
-Read: .planning/MILESTONES.md for what's next
+Command: /gsd:plan-phase 13
+Description: Create execution plans for terminal path resolution fix
+Read: .planning/ROADMAP.md for phase details
 
 ## Milestone History
 
@@ -28,6 +28,7 @@ Read: .planning/MILESTONES.md for what's next
 |---------|------|--------|---------|
 | v1.0 | Lazy Mode MVP | 1-10 (22 plans) | 2026-01-20 |
 | v1.1 | Execution Isolation & Failure Learnings | 11-12 (4 plans) | 2026-01-21 |
+| v1.2 | Terminal Path Resolution | 13 | In Progress |
 
 ## Quick Tasks Completed
 
@@ -39,10 +40,10 @@ Read: .planning/MILESTONES.md for what's next
 
 ## Decisions
 
-(Cleared on milestone completion — see PROJECT.md Key Decisions for full record)
+(Cleared on milestone completion - see PROJECT.md Key Decisions for full record)
 
 ## Session Continuity
 
-Last session: 2026-01-21 23:44 UTC
-Stopped at: Completed quick-003 (fix ralph.sh path bug)
+Last session: 2026-01-21
+Stopped at: Roadmap created for v1.2
 Resume file: None

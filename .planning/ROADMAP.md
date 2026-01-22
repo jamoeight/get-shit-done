@@ -1,102 +1,54 @@
-# Roadmap: v1.9.0 Codebase Intelligence System
+# Roadmap: v1.2 Terminal Path Resolution
 
-**Goal:** Make GSD feel intelligent and automagical in how it navigates and understands both greenfield and brownfield projects.
+**Goal:** Fix terminal path resolution bug that blocks autopilot on Windows when user's Windows Terminal default profile isn't Git Bash.
 
-**Phases:** 5 (4 complete)
+**Phases:** 1 (Phase 13)
 
 ---
 
-## Current Milestone: v1.9.0
+## Current Milestone: v1.2
 
-### Phase 1: Foundation & Learning ✓
-**Goal:** Establish index schema and incremental learning via PostToolUse hook
-**Status:** Complete
-**Plans:** 2/2
-
-### Phase 2: Context Injection ✓
-**Goal:** Inject codebase awareness into every session via SessionStart hook
-**Status:** Complete
-**Plans:** 2/2
-
-### Phase 3: Brownfield & Integration ✓
-**Goal:** Deep analysis command for existing codebases, workflow integration
-**Status:** Complete
-**Plans:** 3/3
-
-### Phase 4: Semantic Intelligence & Scale ✓
-**Goal:** Transform syntax-only indexing into semantic understanding with graph-based relationships
-**Status:** Complete
-**Plans:** 5/5
-
-Plans:
-- [x] 04-01-PLAN.md — SQLite graph layer with sql.js (Wave 1)
-- [x] 04-02-PLAN.md — Graph-backed rich summary generation (Wave 2)
-- [x] 04-03-PLAN.md — Semantic entity generation via Claude API (Wave 2)
-- [x] 04-04-PLAN.md — CLI query interface for getDependents (Wave 3)
-- [x] 04-05-PLAN.md — Wire plan-phase.md to inject intel into planner (Wave 3)
-
-**Wave Structure:**
-- Wave 1: 04-01 (SQLite foundation)
-- Wave 2: 04-02, 04-03 (parallel - both depend only on 04-01)
-- Wave 3: 04-04, 04-05 (parallel - consumption layer)
-
-**Why this phase:**
-- Current system provides "2-3 ls commands worth of information" (Claude's own assessment)
-- Missing: what files actually DO, who uses them, blast radius of changes
-- Senior engineers at top companies need real intelligence, not file counts
-
-**Delivers:**
-- SQLite graph layer (sql.js - zero native deps) for relationship queries
-- Entity-based semantic documentation (Claude writes understanding, not just syntax)
-- Semantic `/gsd:analyze-codebase` that creates initial entities
-- Rich summary generation from accumulated semantic knowledge
-- CLI query interface for "what uses this file?" queries
+### Phase 13: Terminal Path Resolution Fix
+**Goal:** Autopilot works on Windows regardless of terminal configuration
+**Status:** Pending
+**Depends on:** None (standalone bug fix)
+**Plans:** TBD (plan-phase will determine, likely 2-3)
 
 **Requirements:**
-- INTEL-04: Entity files capture semantic understanding (purpose, what exports do)
-- INTEL-05: Relationships queryable ("what uses this file?", "blast radius")
-- INTEL-06: `/gsd:analyze-codebase` creates initial entity docs via Claude
-- INTEL-07: Summary reflects accumulated semantic knowledge
+- TERM-01: wt.exe launcher checks Git Bash existence before attempting launch
+- TERM-02: Try multiple Git Bash installation locations (standard, x86, user installs)
+- TERM-03: Fall back to cmd.exe when Git Bash not found at any location
+- PATH-01: ralph.sh detects bash environment at runtime (Git Bash, WSL, Cygwin)
+- PATH-02: ralph.sh converts Windows paths using native tools (cygpath, wslpath)
+- PATH-03: Fallback chain tries all path formats when native tools unavailable
+- ERR-01: Clear error message when no suitable terminal found
+- ERR-02: Manual fallback instructions displayed when all terminal launchers fail
 
 **Success Criteria:**
-1. Claude can answer "what uses src/lib/db.ts?" from SessionStart context
-2. Summary includes file purposes, not just file counts
-3. Transitive dependency queries work (blast radius)
-4. Works at scale (500+ file codebases)
+1. User with Git Bash installed sees autopilot spawn correctly via wt.exe
+2. User without Git Bash at standard location sees fallback to cmd.exe
+3. User running ralph.sh in any bash variant (Git Bash, WSL, Cygwin) has paths resolve correctly
+4. User sees actionable error message when no suitable terminal found
+5. User can follow manual instructions to run autopilot when all launchers fail
 
-### Phase 5: Subagent Codebase Analysis
-**Goal:** Prevent context exhaustion on large codebases by delegating analysis to subagents
-**Depends on:** Phase 4
-**Plans:** 2 plans
+**Why one phase:**
+- All 8 requirements solve a single bug from two angles (Node.js launcher + bash script)
+- Natural delivery boundary: either path resolution works or it doesn't
+- No dependencies between requirements that would require phasing
 
-Plans:
-- [ ] 05-01-PLAN.md — Create gsd-entity-generator subagent (Wave 1)
-- [ ] 05-02-PLAN.md — Refactor analyze-codebase to use subagent delegation (Wave 2)
+**Implementation split (anticipated by plan-phase):**
+- Plan A: Terminal launcher hardening (TERM-01, TERM-02, TERM-03, ERR-01, ERR-02) - Node.js
+- Plan B: Runtime path resolution (PATH-01, PATH-02, PATH-03) - Bash
 
-**Wave Structure:**
-- Wave 1: 05-01 (agent definition)
-- Wave 2: 05-02 (command refactor + verification)
+---
 
-**Why this phase:**
-- Current entity generation loads file contents in orchestrator context
-- On large codebases (500+ files), orchestrator exhausts context during file selection and batching
-- Subagent delegation gives fresh 200k context for entity generation
+## Milestone History
 
-**Delivers:**
-- `gsd-entity-generator` subagent following gsd-codebase-mapper pattern
-- Refactored `/gsd:analyze-codebase` that spawns subagent instead of inline batching
-- Preserved orchestrator context for large codebase analysis
-
-**Requirements:**
-- INTEL-08: Entity generation delegated to subagent (not inline)
-- INTEL-09: Subagent writes entities directly, returns statistics only
-- INTEL-10: Orchestrator passes file paths, not file contents
-
-**Success Criteria:**
-1. Entity generation works via subagent spawn
-2. Orchestrator context preserved (no file contents loaded)
-3. Entities correctly formatted and graph.db updated
-4. Works on 500+ file codebases without context exhaustion
+| Version | Name | Phases | Status |
+|---------|------|--------|--------|
+| v1.0 | Lazy Mode MVP | 1-10 | Shipped 2026-01-20 |
+| v1.1 | Execution Isolation & Failure Learnings | 11-12 | Shipped 2026-01-21 |
+| v1.2 | Terminal Path Resolution | 13 | Current |
 
 ---
 
@@ -104,17 +56,20 @@ Plans:
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| INTEL-01 | Phase 1 | ✓ Complete |
-| INTEL-02 | Phase 2 | ✓ Complete |
-| INTEL-03 | Phase 3 | ✓ Complete |
-| INTEL-04 | Phase 4 | ✓ Complete (04-03) |
-| INTEL-05 | Phase 4 | ✓ Complete (04-04) |
-| INTEL-06 | Phase 4 | ✓ Complete (04-03) |
-| INTEL-07 | Phase 4 | ✓ Complete (04-02) |
-| INTEL-08 | Phase 5 | Planned (05-01, 05-02) |
-| INTEL-09 | Phase 5 | Planned (05-01) |
-| INTEL-10 | Phase 5 | Planned (05-02) |
+| TERM-01 | Phase 13 | Pending |
+| TERM-02 | Phase 13 | Pending |
+| TERM-03 | Phase 13 | Pending |
+| PATH-01 | Phase 13 | Pending |
+| PATH-02 | Phase 13 | Pending |
+| PATH-03 | Phase 13 | Pending |
+| ERR-01 | Phase 13 | Pending |
+| ERR-02 | Phase 13 | Pending |
+
+**Coverage:**
+- v1.2 requirements: 8 total
+- Mapped to phases: 8
+- Unmapped: 0
 
 ---
-*Created: 2026-01-19*
-*Updated: 2026-01-20 — Phase 5 planned with 2 plans in 2 waves*
+*Created: 2026-01-21*
+*Milestone: v1.2 Terminal Path Resolution*

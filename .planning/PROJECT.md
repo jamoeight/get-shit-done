@@ -34,7 +34,7 @@ Plan once, walk away, wake up to done. No human needed at the computer after pla
 
 ### Active
 
-(No active requirements — planning next milestone)
+- [ ] Universal path resolution for terminal spawning — wt.exe works regardless of default profile (Git Bash, WSL, Cygwin)
 
 ### Out of Scope
 
@@ -81,5 +81,13 @@ Plan once, walk away, wake up to done. No human needed at the computer after pla
 | Phase-scoped failure subsections | Enables selective cleanup without affecting other phases | ✓ Good |
 | 100-failure cap per phase | Prevents unbounded growth, drops oldest first | ✓ Good |
 
+## Current Milestone: v1.2 Terminal Path Resolution
+
+**Goal:** Fix terminal path resolution bug that blocks autopilot on Windows when the user's Windows Terminal default profile isn't Git Bash.
+
+**Target features:**
+- Universal path resolution that works with any bash variant (Git Bash, WSL, Cygwin)
+- Reliable terminal spawning regardless of Windows Terminal default profile
+
 ---
-*Last updated: 2026-01-21 after v1.1 milestone*
+*Last updated: 2026-01-21 after starting v1.2 milestone*
