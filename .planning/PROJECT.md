@@ -31,10 +31,11 @@ Plan once, walk away, wake up to done. No human needed at the computer after pla
 - ✓ Auto-launch terminal for ralph.sh (execution isolation) — v1.1
 - ✓ Cross-platform terminal detection (Windows/macOS/Linux) — v1.1
 - ✓ Failure learnings propagation (extract failure context for retries) — v1.1
+- ✓ Universal path resolution for terminal spawning — v1.2
 
 ### Active
 
-- [ ] Universal path resolution for terminal spawning — wt.exe works regardless of default profile (Git Bash, WSL, Cygwin)
+(None — planning next milestone)
 
 ### Out of Scope
 
@@ -45,17 +46,16 @@ Plan once, walk away, wake up to done. No human needed at the computer after pla
 
 ## Context
 
-**Current State (v1.1 shipped):**
+**Current State (v1.2 shipped):**
 - 13 bash libraries + 1 Node.js module + ralph.sh main script
-- ~5,400 lines of executable code (bin/)
-- +37,000 lines total with planning/docs
-- 12 phases, 26 plans completed across 2 milestones
-- Full audit passed: 8/8 v1.1 requirements, 0 gaps
+- ~5,700 lines of executable code (bin/)
+- +38,000 lines total with planning/docs
+- 13 phases, 28 plans completed across 3 milestones
+- Full audit passed: 8/8 v1.2 requirements, 0 gaps
 
-**v1.1 additions:**
-- bin/lib/terminal-launcher.js (270 lines) — Cross-platform terminal spawning
-- bin/lib/learnings.sh extended (+239 lines) — Failure extraction and storage
-- AGENTS.md Failure Context section — Retry learning propagation
+**v1.2 additions:**
+- bin/lib/terminal-launcher.js extended (+400 lines) — Multi-location Git Bash detection, fallback chain
+- bin/lib/path-resolve.sh (185 lines) — Runtime bash environment detection, path conversion
 
 ## Constraints
 
@@ -81,13 +81,11 @@ Plan once, walk away, wake up to done. No human needed at the computer after pla
 | Phase-scoped failure subsections | Enables selective cleanup without affecting other phases | ✓ Good |
 | 100-failure cap per phase | Prevents unbounded growth, drops oldest first | ✓ Good |
 
-## Current Milestone: v1.2 Terminal Path Resolution
+## Next Milestone
 
-**Goal:** Fix terminal path resolution bug that blocks autopilot on Windows when the user's Windows Terminal default profile isn't Git Bash.
+**Planning:** v2.0 features TBD
 
-**Target features:**
-- Universal path resolution that works with any bash variant (Git Bash, WSL, Cygwin)
-- Reliable terminal spawning regardless of Windows Terminal default profile
+Run `/gsd:new-milestone` to define next milestone goals, requirements, and roadmap.
 
 ---
-*Last updated: 2026-01-21 after starting v1.2 milestone*
+*Last updated: 2026-01-21 after v1.2 milestone shipped*

@@ -1,5 +1,32 @@
 # Project Milestones: GSD Lazy Mode
 
+## v1.2 Terminal Path Resolution (Shipped: 2026-01-21)
+
+**Delivered:** Universal terminal path resolution — autopilot works on Windows regardless of terminal configuration or Git Bash installation location.
+
+**Phases completed:** 13 (2 plans total)
+
+**Key accomplishments:**
+
+- Multi-location Git Bash detection covering standard, x86, Scoop, and custom installations
+- Automatic fallback chain from Windows Terminal to cmd.exe when Git Bash unavailable
+- Runtime bash environment detection (msys/Git Bash, WSL, Cygwin)
+- Cross-platform path conversion with native tool fallback (cygpath → wslpath → manual)
+- Diagnostic tooling for troubleshooting path resolution issues
+
+**Stats:**
+
+- 3 files created/modified
+- +700 lines of code (bash + js)
+- 1 phase, 2 plans executed
+- 6 days from start to ship (2026-01-15 → 2026-01-21)
+
+**Git range:** `20bb210` → `e86ca22`
+
+**What's next:** v2.0 with monitoring, cost tracking, and advanced recovery features.
+
+---
+
 ## v1.1 Execution Isolation & Failure Learnings (Shipped: 2026-01-21)
 
 **Delivered:** Execution isolation (ralph.sh in separate terminal) and failure learnings (retry attempts learn from previous mistakes).
